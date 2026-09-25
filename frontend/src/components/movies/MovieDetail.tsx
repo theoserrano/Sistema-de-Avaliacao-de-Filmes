@@ -1,6 +1,8 @@
 import { useMovieDetail } from '../../hooks/useMovieDetail';
-import { MovieMeta } from './MovieMeta';
+import { useMovieMutations } from '../../hooks/useMovieMutations';
+import { ReviewForm } from '../reviews/ReviewForm';
 import { ReviewList } from '../reviews/ReviewList';
+import { MovieMeta } from './MovieMeta';
 
 interface MovieDetailProps {
   selectedMovieId: string | null;
@@ -8,7 +10,16 @@ interface MovieDetailProps {
 }
 
 export function MovieDetail({ selectedMovieId, onDeleteMovie }: MovieDetailProps) {
-  const { movie, reviews, loading, error } = useMovieDetail(selectedMovieId);
+  const { movie, reviews, loading, error, refresh } = useMovieDetail(selectedMovieId);
+  const { addReview, isSubmitting } = useMovieMutations();
+
+  const handleAddReview = async (movieId: string, data: { nome: string; nota: number; comentario: string }) => {
+    const addedReview = await addReview(movieId, data);
+
+    if (addedReview) {
+      await refresh();
+    }
+  };
 
   if (!selectedMovieId) {
     return <p className="state-message">Selecione um filme no catálogo para ver os detalhes.</p>;
@@ -44,6 +55,12 @@ export function MovieDetail({ selectedMovieId, onDeleteMovie }: MovieDetailProps
         <h3>Histórico de Resenhas</h3>
         <ReviewList reviews={reviews} loading={loading} error={null} />
       </div>
+
+      <ReviewForm
+        movieId={selectedMovieId}
+        onSubmit={handleAddReview}
+        loading={isSubmitting}
+      />
     </>
   );
 }

@@ -47,7 +47,9 @@ class MovieResponse(BaseModel):
     duracao_minutos: Optional[int] = None
     sinopse: Optional[str] = None
     url_poster: Optional[str] = None
-    reviews: List[ReviewResponse] = []
+    media_avaliacoes: Optional[float] = 0.0
+    total_avaliacoes: int = 0
+    reviews: List[ReviewResponse] = Field(default_factory=list)
 
     class Config:
         from_attributes = True

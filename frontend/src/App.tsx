@@ -1,11 +1,11 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import './App.css';
+import { MovieDetail } from './components/movies/MovieDetail';
 import { MovieList } from './components/movies/MovieList';
 import { SearchBar } from './components/movies/SearchBar';
-import { useMovieDetail } from './hooks/useMovieDetail';
 import { useMovieMutations } from './hooks/useMovieMutations';
 import { useMovies } from './hooks/useMovies';
-import type { MovieCreateData, ReviewCreateData } from './types/movie';
+import type { MovieCreateData } from './types/movie';
 
 const createMovieDraft = (): MovieCreateData => ({
   id_filme: `movie_${Date.now()}`,
@@ -16,12 +16,6 @@ const createMovieDraft = (): MovieCreateData => ({
   sinopse: 'Filme de teste criado para validação de integração com o backend.',
   url_poster: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80',
 });
-
-const defaultReviewForm: ReviewCreateData = {
-  nome: '',
-  nota: 8,
-  comentario: '',
-};
 
 function App() {
   const {
@@ -37,21 +31,10 @@ function App() {
 
   const [selectedMovieId, setSelectedMovieId] = useState<string | null>(null);
   const [movieForm, setMovieForm] = useState<MovieCreateData>(createMovieDraft);
-  const [reviewForm, setReviewForm] = useState<ReviewCreateData>(defaultReviewForm);
-
-  const {
-    movie,
-    reviews,
-    loading: loadingDetail,
-    error: detailError,
-    refresh: refreshDetail,
-  } = useMovieDetail(selectedMovieId);
 
   const {
     createMovie,
-    updateMovie,
     deleteMovie,
-    addReview,
     isSubmitting,
     submitError,
   } = useMovieMutations();
@@ -78,41 +61,6 @@ function App() {
       console.log('[App] filme criado com sucesso', createdMovie);
       setMovieForm(createMovieDraft());
       setSelectedMovieId(createdMovie.sk_movie_id);
-      await refreshMovies();
-    }
-  };
-
-  const handleAddReview = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!selectedMovieId) {
-      return;
-    }
-
-    const addedReview = await addReview(selectedMovieId, {
-      ...reviewForm,
-      nome: reviewForm.nome.trim(),
-      comentario: reviewForm.comentario.trim(),
-    });
-
-    if (addedReview) {
-      setReviewForm(defaultReviewForm);
-      await refreshDetail(selectedMovieId);
-      await refreshMovies();
-    }
-  };
-
-  const handleUpdateMovie = async () => {
-    if (!selectedMovieId || !movie) {
-      return;
-    }
-
-    const updatedMovie = await updateMovie(selectedMovieId, {
-      titulo: `${movie.titulo} (atualizado em teste)`,
-    });
-
-    if (updatedMovie) {
-      await refreshDetail(selectedMovieId);
       await refreshMovies();
     }
   };
@@ -164,88 +112,7 @@ function App() {
         </aside>
 
         <section className="panel detail-panel">
-          {loadingDetail ? (
-            <p className="state-message">Carregando detalhes do filme...</p>
-          ) : detailError ? (
-            <p className="state-message error">{detailError}</p>
-          ) : movie ? (
-            <>
-              <div className="detail-header">
-                <img src={movie.url_poster || 'https://placehold.co/400x600?text=Poster'} alt={movie.titulo} />
-                <div>
-                  <p className="eyebrow">{movie.id_filme}</p>
-                  <h2>{movie.titulo}</h2>
-                  <p>{movie.sinopse || 'Sem sinopse disponível.'}</p>
-                  <div className="meta-row">
-                    <span>{movie.ano_lancamento || 'Sem ano'}</span>
-                    <span>{movie.duracao_minutos ? `${movie.duracao_minutos} min` : 'Sem duração'}</span>
-                    <span>{movie.media_avaliacoes ?? 0} ★</span>
-                  </div>
-                  <div className="detail-actions">
-                    <button type="button" className="primary-button" onClick={handleUpdateMovie} disabled={isSubmitting}>
-                      Atualizar registro
-                    </button>
-                    <button
-                      type="button"
-                      className="danger-button"
-                      onClick={() => handleDeleteMovie(movie.sk_movie_id)}
-                      disabled={isSubmitting}
-                    >
-                      Excluir filme
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="reviews-box">
-                <h3>Reviews</h3>
-                {reviews.length === 0 ? (
-                  <p className="state-message">Nenhuma avaliação encontrada para este filme.</p>
-                ) : (
-                  <ul className="review-list">
-                    {reviews.map((review) => (
-                      <li key={review.sk_movie_review_id}>
-                        <strong>{review.nome}</strong>
-                        <span>{review.nota} / 10</span>
-                        <p>{review.comentario}</p>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-
-              <form className="form-box" onSubmit={handleAddReview}>
-                <h3>Adicionar review</h3>
-                <div className="field-grid">
-                  <input
-                    type="text"
-                    placeholder="Seu nome"
-                    value={reviewForm.nome}
-                    onChange={(event) => setReviewForm((current) => ({ ...current, nome: event.target.value }))}
-                  />
-                  <input
-                    type="number"
-                    min={0}
-                    max={10}
-                    step={0.5}
-                    value={reviewForm.nota}
-                    onChange={(event) => setReviewForm((current) => ({ ...current, nota: Number(event.target.value) }))}
-                  />
-                </div>
-                <textarea
-                  rows={4}
-                  placeholder="Escreva sua avaliação"
-                  value={reviewForm.comentario}
-                  onChange={(event) => setReviewForm((current) => ({ ...current, comentario: event.target.value }))}
-                />
-                <button type="submit" className="primary-button" disabled={isSubmitting}>
-                  {isSubmitting ? 'Enviando...' : 'Salvar review'}
-                </button>
-              </form>
-            </>
-          ) : (
-            <p className="state-message">Selecione um filme para ver os detalhes.</p>
-          )}
+          <MovieDetail selectedMovieId={selectedMovieId} onDeleteMovie={handleDeleteMovie} />
         </section>
 
         <aside className="panel right-panel">
@@ -287,7 +154,7 @@ function App() {
           </form>
 
           {submitError && <p className="state-message error">{submitError}</p>}
-          {(moviesError || detailError) && <p className="state-message error">{moviesError || detailError}</p>}
+          {moviesError && <p className="state-message error">{moviesError}</p>}
         </aside>
       </section>
     </main>

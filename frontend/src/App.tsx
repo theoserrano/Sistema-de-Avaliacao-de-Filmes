@@ -60,49 +60,81 @@ function App() {
   };
 
   return (
-    <main className="app-shell">
-      <header className="topbar">
-        <div>
-          <p className="eyebrow">Sistema de avaliação de filmes</p>
-          <h1>Validação de integração com backend</h1>
-        </div>
-        <button type="button" className="secondary-button" onClick={() => refreshMovies()}>
-          Atualizar catálogo
-        </button>
-      </header>
-
-      <section className="panel-grid">
-        <aside className="panel left-panel">
-          <div className="panel-header">
-            <h2>Catálogo</h2>
-            <SearchBar value={search} onChange={setSearch} />
+    <>
+      <header className="topbar-shell">
+        <div className="topbar-inner">
+          <div className="brand" aria-label="Letterboxd style brand">
+            <span className="brand-mark brand-mark--1" />
+            <span className="brand-mark brand-mark--2" />
+            <span className="brand-mark brand-mark--3" />
+            <span className="brand-name">Letterboxd</span>
           </div>
 
-          <MovieList
-            movies={movies}
-            selectedMovieId={selectedMovieId}
-            onSelectMovie={setSelectedMovieId}
-            loading={loadingMovies}
-            error={moviesError}
-          />
+          <nav className="topbar-nav" aria-label="Navegação principal">
+            <a href="#">FILMS</a>
+            <a href="#">LISTS</a>
+            <a href="#">MEMBERS</a>
+            <a href="#">JOURNAL</a>
+          </nav>
 
-          {hasMore && !loadingMovies && (
-            <button type="button" className="primary-button" onClick={() => loadMore()}>
-              Carregar mais
-            </button>
-          )}
-        </aside>
+          <button type="button" className="ghost-button" onClick={() => refreshMovies()}>
+            Atualizar
+          </button>
+        </div>
+      </header>
 
-        <section className="panel detail-panel">
-          <MovieDetail selectedMovieId={selectedMovieId} onDeleteMovie={handleDeleteMovie} />
+      <main className="app-shell">
+        <section className="profile-strip">
+          <div className="profile-avatar">A</div>
+          <div className="profile-info">
+            <span className="profile-name">Arthur Tuoto</span>
+            <span className="profile-badge">PATRON</span>
+          </div>
+          <div className="profile-tabs" aria-label="Tab de navegação do perfil">
+            <span>Activity</span>
+            <span>Films</span>
+            <span>Diary</span>
+            <span>Reviews</span>
+            <span className="tab-active">Lists</span>
+            <span>Likes</span>
+            <span>Network</span>
+            <span>Stats</span>
+          </div>
         </section>
 
-        <aside className="panel right-panel">
-          <MovieForm onSubmit={handleCreateMovie} loading={isSubmitting} />
-          {moviesError && <p className="state-message error">{moviesError}</p>}
-        </aside>
-      </section>
-    </main>
+        <section className="panel-grid">
+          <aside className="panel left-panel">
+            <div className="panel-header">
+              <h2>Catálogo</h2>
+              <SearchBar value={search} onChange={setSearch} />
+            </div>
+
+            <MovieList
+              movies={movies}
+              selectedMovieId={selectedMovieId}
+              onSelectMovie={setSelectedMovieId}
+              loading={loadingMovies}
+              error={moviesError}
+            />
+
+            {hasMore && !loadingMovies && (
+              <button type="button" className="primary-button" onClick={() => loadMore()}>
+                Carregar mais
+              </button>
+            )}
+          </aside>
+
+          <section className="panel detail-panel">
+            <MovieDetail selectedMovieId={selectedMovieId} onDeleteMovie={handleDeleteMovie} />
+          </section>
+
+          <aside className="panel right-panel">
+            <MovieForm onSubmit={handleCreateMovie} loading={isSubmitting} />
+            {moviesError && <p className="state-message error">{moviesError}</p>}
+          </aside>
+        </section>
+      </main>
+    </>
   );
 }
 

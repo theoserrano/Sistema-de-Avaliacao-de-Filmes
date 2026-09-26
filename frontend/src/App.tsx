@@ -5,6 +5,7 @@ import { MovieDetail } from './components/movies/MovieDetail';
 import { MovieForm } from './components/movies/MovieForm';
 import { MovieList } from './components/movies/MovieList';
 import { SearchBar } from './components/movies/SearchBar';
+import { ProfileStrip, type ProfileTab } from './components/ui/ProfileStrip';
 import { useMovieMutations } from './hooks/useMovieMutations';
 import { useMovies } from './hooks/useMovies';
 import type { MovieCreateData } from './types/movie';
@@ -23,7 +24,7 @@ function App() {
 
   const [selectedMovieId, setSelectedMovieId] = useState<string | null>(null);
   const [isMovieFormOpen, setIsMovieFormOpen] = useState(false);
-  const [profileTab, setProfileTab] = useState<'watched' | 'all'>('watched');
+  const [profileTab, setProfileTab] = useState<ProfileTab>('watched');
 
   const visibleMovies = useMemo(() => {
     if (profileTab === 'all') {
@@ -104,29 +105,7 @@ function App() {
       </header>
 
       <main className="app-shell">
-        <section className="profile-strip">
-          <div className="profile-avatar">S</div>
-          <div className="profile-info">
-            <span className="profile-name">Seu perfil</span>
-          </div>
-
-          <div className="profile-tabs" aria-label="Tab de navegação do perfil">
-            <button
-              type="button"
-              className={profileTab === 'watched' ? 'tab-button tab-active' : 'tab-button'}
-              onClick={() => setProfileTab('watched')}
-            >
-              Assistidos
-            </button>
-            <button
-              type="button"
-              className={profileTab === 'all' ? 'tab-button tab-active' : 'tab-button'}
-              onClick={() => setProfileTab('all')}
-            >
-              Todos
-            </button>
-          </div>
-        </section>
+        <ProfileStrip profileTab={profileTab} onTabChange={setProfileTab} />
 
         <section className="panel-grid">
           <aside className="panel left-panel">

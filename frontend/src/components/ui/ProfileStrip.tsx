@@ -48,7 +48,14 @@ export function ProfileStrip({
         ) : (
           <>
             <span className="profile-name">{profileName}</span>
-            <button type="button" className="ghost-button profile-edit-button" onClick={() => setIsEditing(true)}>
+            <button
+              type="button"
+              className="ghost-button profile-edit-button"
+              onClick={() => {
+                setDraftName(profileName);
+                setIsEditing(true);
+              }}
+            >
               Editar
             </button>
           </>

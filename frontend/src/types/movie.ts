@@ -27,6 +27,7 @@ export interface Movie {
   media_avaliacoes?: number;
   total_avaliacoes?: number;
   reviews?: Review[];
+  atores?: any[];
 }
 
 export interface MovieCreateData {

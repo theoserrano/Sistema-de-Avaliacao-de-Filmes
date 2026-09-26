@@ -3,12 +3,14 @@ import { useMovieDetail } from '../../hooks/useMovieDetail';
 import { useMovieMutations } from '../../hooks/useMovieMutations';
 import { ReviewForm } from '../reviews/ReviewForm';
 import { ReviewList } from '../reviews/ReviewList';
+import type { Movie } from '../../types/movie';
 import { MovieMeta } from './MovieMeta';
 
 interface MovieDetailProps {
   profileName: string;
   selectedMovieId: string | null;
   onDeleteMovie: (movieId: string) => void;
+  onEditMovie?: (movie: Movie) => void;
   isMovieInWatchlist: (movieId: string) => boolean;
   onToggleWatchlist: (movieId: string) => void;
 }
@@ -17,6 +19,7 @@ export function MovieDetail({
   profileName,
   selectedMovieId,
   onDeleteMovie,
+  onEditMovie,
   isMovieInWatchlist,
   onToggleWatchlist,
 }: MovieDetailProps) {
@@ -72,6 +75,14 @@ export function MovieDetail({
 
         <button
           type="button"
+          className="secondary-button"
+          onClick={() => onEditMovie?.(movie)}
+        >
+          Editar Filme
+        </button>
+
+        <button
+          type="button"
           className="danger-button"
           onClick={() => onDeleteMovie(movie.sk_movie_id)}
         >
@@ -89,7 +100,12 @@ export function MovieDetail({
           <div className="modal-panel modal-panel--compact" onClick={(event) => event.stopPropagation()}>
             <div className="modal-header">
               <h3>Adicionar Avaliação</h3>
-              <button type="button" className="icon-button" onClick={() => setIsReviewFormOpen(false)} aria-label="Fechar modal de avaliação">
+              <button
+                type="button"
+                className="icon-button"
+                onClick={() => setIsReviewFormOpen(false)}
+                aria-label="Fechar modal de avaliação"
+              >
                 ×
               </button>
             </div>

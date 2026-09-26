@@ -1,18 +1,37 @@
-import React, { useState } from 'react';
-import type { MovieCreateData } from '../../types/movie';
+import React, { useEffect, useState } from 'react';
+import type { Movie, MovieCreateData } from '../../types/movie';
 
 interface MovieFormProps {
   onSubmit: (data: MovieCreateData) => Promise<void>;
   loading: boolean;
+  initialData?: Movie | null;
 }
 
-export const MovieForm: React.FC<MovieFormProps> = ({ onSubmit, loading }) => {
-  const [titulo, setTitulo] = useState('');
-  const [ano, setAno] = useState<number>(new Date().getFullYear());
-  const [duracao, setDuracao] = useState<number>(120);
-  const [sinopse, setSinopse] = useState('');
-  const [urlPoster, setUrlPoster] = useState('');
+export const MovieForm: React.FC<MovieFormProps> = ({ onSubmit, loading, initialData }) => {
+  const [titulo, setTitulo] = useState(initialData?.titulo || '');
+  const [ano, setAno] = useState<number>(initialData?.ano_lancamento ?? new Date().getFullYear());
+  const [duracao, setDuracao] = useState<number>(initialData?.duracao_minutos ?? 120);
+  const [sinopse, setSinopse] = useState(initialData?.sinopse || '');
+  const [urlPoster, setUrlPoster] = useState(initialData?.url_poster || '');
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (initialData) {
+      setTitulo(initialData.titulo || '');
+      setAno(initialData.ano_lancamento ?? new Date().getFullYear());
+      setDuracao(initialData.duracao_minutos ?? 120);
+      setSinopse(initialData.sinopse || '');
+      setUrlPoster(initialData.url_poster || '');
+    } else {
+      setTitulo('');
+      setAno(new Date().getFullYear());
+      setDuracao(120);
+      setSinopse('');
+      setUrlPoster('');
+    }
+    setError(null);
+  }, [initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +43,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSubmit, loading }) => {
     }
 
     const payload: MovieCreateData = {
-      id_filme: `movie_${Date.now()}`,
+      id_filme: initialData?.id_filme || `movie_${Date.now()}`,
       titulo,
       ano_lancamento: Number(ano),
       duracao_minutos: Number(duracao),
@@ -34,19 +53,31 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSubmit, loading }) => {
 
     try {
       await onSubmit(payload);
-      setTitulo('');
-      setSinopse('');
-      setUrlPoster('');
-      setAno(new Date().getFullYear());
-      setDuracao(120);
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Erro ao cadastrar filme.');
+      if (!initialData) {
+        setTitulo('');
+        setSinopse('');
+        setUrlPoster('');
+        setAno(new Date().getFullYear());
+        setDuracao(120);
+      }
+    } catch (err: unknown) {
+      const responseDetail =
+        typeof err === 'object' && err !== null && 'response' in err
+          ? (err as { response?: { data?: { detail?: string } } }).response?.data?.detail
+          : undefined;
+      const errorMessage = err instanceof Error ? err.message : undefined;
+
+      setError(
+        responseDetail ||
+        errorMessage ||
+        (initialData ? 'Erro ao atualizar filme.' : 'Erro ao cadastrar filme.')
+      );
     }
   };
 
   return (
     <form className="form-box" onSubmit={handleSubmit}>
-      <h2>Cadastrar Novo Filme</h2>
+      <h2>{initialData ? 'Editar Filme' : 'Cadastrar Novo Filme'}</h2>
       {error && <p className="state-message error">{error}</p>}
 
       <input
@@ -62,14 +93,14 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSubmit, loading }) => {
         <input
           type="number"
           placeholder="Ano"
-          value={ano}
+          value={ano || ''}
           onChange={(e) => setAno(parseInt(e.target.value, 10))}
           disabled={loading}
         />
         <input
           type="number"
           placeholder="Duração (min)"
-          value={duracao}
+          value={duracao || ''}
           onChange={(e) => setDuracao(parseInt(e.target.value, 10))}
           disabled={loading}
         />
@@ -92,7 +123,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSubmit, loading }) => {
       />
 
       <button type="submit" className="primary-button" disabled={loading}>
-        {loading ? 'Salvando...' : 'Salvar Filme'}
+        {loading ? 'Salvando...' : initialData ? 'Atualizar Filme' : 'Salvar Filme'}
       </button>
     </form>
   );

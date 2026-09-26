@@ -50,8 +50,18 @@ function App() {
 
   const [selectedMovieId, setSelectedMovieId] = useState<string | null>(null);
   const [isMovieFormOpen, setIsMovieFormOpen] = useState(false);
+  const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
+  const [detailVersion, setDetailVersion] = useState(0);
   const [profileSection, setProfileSection] = useState<ProfileSection>('films');
-  const [profileName, setProfileName] = useState('Usuário');
+  const [profileName, setProfileName] = useState<string>(() => {
+    return localStorage.getItem('theoboxd_username') || 'Usuário';
+  });
+
+  const handleProfileNameChange = (newName: string) => {
+    setProfileName(newName);
+    localStorage.setItem('theoboxd_username', newName);
+  };
+
   const [historyMovies, setHistoryMovies] = useState<Movie[]>([]);
   const [watchlists, setWatchlists] = useState<WatchlistRecord[]>(readWatchlists);
 
@@ -139,6 +149,7 @@ function App() {
 
   const {
     createMovie,
+    updateMovie,
     deleteMovie,
     isSubmitting,
   } = useMovieMutations();
@@ -154,17 +165,56 @@ function App() {
     }
   }, [selectedMovieId, visibleMovies]);
 
-  const handleCreateMovie = async (data: MovieCreateData) => {
-    const createdMovie = await createMovie({
-      ...data,
-      titulo: data.titulo.trim(),
-    });
+  const handleOpenCreateMovie = () => {
+    setEditingMovie(null);
+    setIsMovieFormOpen(true);
+  };
 
-    if (createdMovie) {
-      console.log('[App] filme criado com sucesso', createdMovie);
-      setSelectedMovieId(createdMovie.sk_movie_id);
-      setIsMovieFormOpen(false);
-      await refreshMovies();
+  const handleEditMovie = (movieToEdit?: Movie) => {
+    const targetMovie = movieToEdit || visibleMovies.find((m) => m.sk_movie_id === selectedMovieId);
+    if (targetMovie) {
+      setEditingMovie(targetMovie);
+      setIsMovieFormOpen(true);
+    }
+  };
+
+  const handleCloseMovieModal = () => {
+    setIsMovieFormOpen(false);
+    setEditingMovie(null);
+  };
+
+  const handleSaveMovie = async (data: MovieCreateData) => {
+    if (editingMovie) {
+      const updatedMovie = await updateMovie(editingMovie.sk_movie_id, {
+        titulo: data.titulo.trim(),
+        ano_lancamento: data.ano_lancamento,
+        duracao_minutos: data.duracao_minutos,
+        sinopse: data.sinopse,
+        url_poster: data.url_poster,
+      });
+
+      if (updatedMovie) {
+        console.log('[App] filme atualizado com sucesso', updatedMovie);
+        handleCloseMovieModal();
+        setDetailVersion((prev) => prev + 1);
+        await refreshMovies();
+      } else {
+        throw new Error('Falha ao atualizar o filme.');
+      }
+    } else {
+      const createdMovie = await createMovie({
+        ...data,
+        titulo: data.titulo.trim(),
+      });
+
+      if (createdMovie) {
+        console.log('[App] filme criado com sucesso', createdMovie);
+        setSelectedMovieId(createdMovie.sk_movie_id);
+        handleCloseMovieModal();
+        await refreshMovies();
+      } else {
+        throw new Error('Falha ao cadastrar o filme.');
+      }
     }
   };
 
@@ -196,7 +246,7 @@ function App() {
           profileName={profileName}
           profileSection={profileSection}
           onSectionChange={setProfileSection}
-          onProfileNameChange={setProfileName}
+          onProfileNameChange={handleProfileNameChange}
         />
 
         {profileSection === 'films' ? (
@@ -224,9 +274,11 @@ function App() {
 
             <section className="panel detail-panel">
               <MovieDetail
+                key={`${selectedMovieId}-${detailVersion}`}
                 profileName={profileName}
                 selectedMovieId={selectedMovieId}
                 onDeleteMovie={handleDeleteMovie}
+                onEditMovie={handleEditMovie}
                 isMovieInWatchlist={isMovieInWatchlist}
                 onToggleWatchlist={handleToggleWatchlist}
               />
@@ -235,7 +287,7 @@ function App() {
             <aside className="panel right-panel">
               <div className="panel-header">
                 <h2>Ações</h2>
-                <button type="button" className="primary-button" onClick={() => setIsMovieFormOpen(true)}>
+                <button type="button" className="primary-button" onClick={handleOpenCreateMovie}>
                   Cadastrar filme
                 </button>
               </div>
@@ -287,16 +339,26 @@ function App() {
       </main>
 
       {isMovieFormOpen && (
-        <div className="modal-backdrop" onClick={() => setIsMovieFormOpen(false)}>
+        <div className="modal-backdrop" onClick={handleCloseMovieModal}>
           <div className="modal-panel" onClick={(event) => event.stopPropagation()}>
             <div className="modal-header">
-              <h3>Cadastrar Novo Filme</h3>
-              <button type="button" className="icon-button" onClick={() => setIsMovieFormOpen(false)} aria-label="Fechar modal">
+              <h3>{editingMovie ? 'Editar Filme' : 'Cadastrar Novo Filme'}</h3>
+              <button
+                type="button"
+                className="icon-button"
+                onClick={handleCloseMovieModal}
+                aria-label="Fechar modal"
+              >
                 ×
               </button>
             </div>
 
-            <MovieForm onSubmit={handleCreateMovie} loading={isSubmitting} />
+            <MovieForm
+              key={editingMovie?.sk_movie_id || 'create'}
+              onSubmit={handleSaveMovie}
+              loading={isSubmitting}
+              initialData={editingMovie}
+            />
           </div>
         </div>
       )}

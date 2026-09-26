@@ -1,5 +1,6 @@
 import type { Movie } from '../../types/movie';
 import { MovieListItem } from './MovieListItem';
+import './MovieList.css';
 
 interface MovieListProps {
   movies: Movie[];

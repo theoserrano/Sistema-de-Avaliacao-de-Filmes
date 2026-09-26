@@ -5,6 +5,7 @@ import { ReviewForm } from '../reviews/ReviewForm';
 import { ReviewList } from '../reviews/ReviewList';
 import type { Movie } from '../../types/movie';
 import { MovieMeta } from './MovieMeta';
+import './MovieDetail.css';
 
 interface MovieDetailProps {
   profileName: string;

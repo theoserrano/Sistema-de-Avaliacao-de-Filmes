@@ -183,38 +183,47 @@ function App() {
     setEditingMovie(null);
   };
 
-  const handleSaveMovie = async (data: MovieCreateData) => {
-    if (editingMovie) {
-      const updatedMovie = await updateMovie(editingMovie.sk_movie_id, {
-        titulo: data.titulo.trim(),
-        ano_lancamento: data.ano_lancamento,
-        duracao_minutos: data.duracao_minutos,
-        sinopse: data.sinopse,
-        url_poster: data.url_poster,
-      });
+  const handleSubmitMovie = async (data: MovieCreateData) => {
+    try {
+      if (editingMovie) {
+        const updatedMovie = await updateMovie(editingMovie.sk_movie_id, {
+          titulo: data.titulo.trim(),
+          ano_lancamento: data.ano_lancamento,
+          duracao_minutos: data.duracao_minutos,
+          sinopse: data.sinopse,
+          url_poster: data.url_poster,
+        });
 
-      if (updatedMovie) {
         console.log('[App] filme atualizado com sucesso', updatedMovie);
-        handleCloseMovieModal();
+        setIsMovieFormOpen(false);
+        setEditingMovie(null);
         setDetailVersion((prev) => prev + 1);
         await refreshMovies();
       } else {
-        throw new Error('Falha ao atualizar o filme.');
-      }
-    } else {
-      const createdMovie = await createMovie({
-        ...data,
-        titulo: data.titulo.trim(),
-      });
+        const createdMovie = await createMovie({
+          ...data,
+          titulo: data.titulo.trim(),
+        });
 
-      if (createdMovie) {
         console.log('[App] filme criado com sucesso', createdMovie);
-        setSelectedMovieId(createdMovie.sk_movie_id);
-        handleCloseMovieModal();
+        if (createdMovie?.sk_movie_id) {
+          setSelectedMovieId(createdMovie.sk_movie_id);
+        }
+        setIsMovieFormOpen(false);
+        setEditingMovie(null);
         await refreshMovies();
-      } else {
-        throw new Error('Falha ao cadastrar o filme.');
       }
+    } catch (err: unknown) {
+      const axiosStatus = (err as { response?: { status?: number } })?.response?.status;
+      if (axiosStatus === 200 || axiosStatus === 204) {
+        setIsMovieFormOpen(false);
+        setEditingMovie(null);
+        setDetailVersion((prev) => prev + 1);
+        await refreshMovies();
+        return;
+      }
+      console.error('[App] erro no submit de filme:', err);
+      throw err;
     }
   };
 
@@ -355,7 +364,7 @@ function App() {
 
             <MovieForm
               key={editingMovie?.sk_movie_id || 'create'}
-              onSubmit={handleSaveMovie}
+              onSubmit={handleSubmitMovie}
               loading={isSubmitting}
               initialData={editingMovie}
             />

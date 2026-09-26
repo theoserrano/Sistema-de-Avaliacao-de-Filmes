@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import type { Movie, MovieCreateData } from '../../types/movie';
+import './MovieForm.css';
 
 interface MovieFormProps {
   onSubmit: (data: MovieCreateData) => Promise<void>;
@@ -53,6 +54,7 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSubmit, loading, initial
 
     try {
       await onSubmit(payload);
+      setError(null);
       if (!initialData) {
         setTitulo('');
         setSinopse('');
@@ -61,6 +63,12 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSubmit, loading, initial
         setDuracao(120);
       }
     } catch (err: unknown) {
+      const axiosStatus = (err as { response?: { status?: number } })?.response?.status;
+      if (axiosStatus === 200 || axiosStatus === 204) {
+        setError(null);
+        return;
+      }
+
       const responseDetail =
         typeof err === 'object' && err !== null && 'response' in err
           ? (err as { response?: { data?: { detail?: string } } }).response?.data?.detail
@@ -77,7 +85,6 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSubmit, loading, initial
 
   return (
     <form className="form-box" onSubmit={handleSubmit}>
-      <h2>{initialData ? 'Editar Filme' : 'Cadastrar Novo Filme'}</h2>
       {error && <p className="state-message error">{error}</p>}
 
       <input

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import './ProfileStrip.css';
 
 export type ProfileSection = 'films' | 'diary' | 'watchlist' | 'lists';
 

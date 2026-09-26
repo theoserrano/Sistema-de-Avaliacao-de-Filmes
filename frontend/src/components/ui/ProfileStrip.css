@@ -1,0 +1,133 @@
+.profile-strip {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(38, 49, 58, 0.7);
+  border: 1px solid var(--letterboxd-border);
+  border-radius: 12px;
+  padding: 20px 18px;
+  margin-bottom: 22px;
+}
+
+.profile-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: var(--letterboxd-white);
+  background: linear-gradient(135deg, #d7dfe7, #8597a3);
+}
+
+.profile-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 220px;
+}
+
+.profile-editor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-name-input {
+  width: min(190px, 36vw);
+  padding: 7px 9px;
+}
+
+.profile-edit-button,
+.profile-save-button {
+  padding: 7px 10px;
+  font-size: 0.68rem;
+}
+
+.profile-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--letterboxd-white);
+}
+
+.profile-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  gap: 16px;
+  min-width: 0;
+}
+
+.profile-main-tabs,
+.profile-subtabs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+}
+
+.profile-main-tabs {
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.profile-subtabs {
+  margin-left: auto;
+}
+
+.tab-button,
+.subtab-button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--letterboxd-text-soft);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0 0 6px;
+  position: relative;
+  cursor: pointer;
+}
+
+.subtab-button {
+  font-size: 0.72rem;
+  padding: 0 0 4px;
+}
+
+.tab-button.tab-active,
+.subtab-button.subtab-active {
+  color: var(--letterboxd-white);
+}
+
+.tab-button.tab-active::after,
+.subtab-button.subtab-active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 2px;
+  background: var(--letterboxd-green);
+}
+
+@media (max-width: 1024px) {
+  .profile-strip {
+    flex-wrap: wrap;
+  }
+
+  .profile-tabs {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 760px) {
+  .profile-nav {
+    width: 100%;
+  }
+
+  .profile-main-tabs {
+    justify-content: space-between;
+  }
+}

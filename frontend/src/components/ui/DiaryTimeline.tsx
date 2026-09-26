@@ -1,5 +1,5 @@
 import type { Review } from '../../types/movie';
-import { StarRating } from './StarRating';
+
 
 export interface DiaryEntry {
   movieId: string;
@@ -48,7 +48,6 @@ export function DiaryTimeline({ entries, profileName }: DiaryTimelineProps) {
               </div>
 
               <div className="diary-meta-row">
-                <StarRating value={movieRating} max={5} size="sm" />
                 <span className="diary-score">{movieRating.toFixed(1)}/10</span>
               </div>
 

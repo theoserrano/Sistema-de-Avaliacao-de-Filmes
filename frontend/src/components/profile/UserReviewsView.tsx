@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Review } from '../../types/movie';
-import { StarRating } from '../ui/StarRating';
+
 
 export interface UserReviewEntry {
   movieId: string;
@@ -48,7 +48,6 @@ export const UserReviewsView: React.FC<UserReviewsViewProps> = ({ entries, profi
               </div>
 
               <div className="user-review-meta">
-                <StarRating value={movieRating} max={5} size="sm" />
                 <span className="user-review-score">{movieRating.toFixed(1)}/10</span>
                 <span className="user-review-date">• {formattedDate}</span>
               </div>

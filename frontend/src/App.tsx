@@ -5,7 +5,7 @@ import { MovieDetail } from './components/movies/MovieDetail';
 import { MovieForm } from './components/movies/MovieForm';
 import { MovieList } from './components/movies/MovieList';
 import { SearchBar } from './components/movies/SearchBar';
-import { ProfileStrip, type ProfileTab } from './components/ui/ProfileStrip';
+import { ProfileStrip, type FilmFilter, type ProfileSection } from './components/ui/ProfileStrip';
 import { useMovieMutations } from './hooks/useMovieMutations';
 import { useMovies } from './hooks/useMovies';
 import type { MovieCreateData } from './types/movie';
@@ -24,15 +24,20 @@ function App() {
 
   const [selectedMovieId, setSelectedMovieId] = useState<string | null>(null);
   const [isMovieFormOpen, setIsMovieFormOpen] = useState(false);
-  const [profileTab, setProfileTab] = useState<ProfileTab>('watched');
+  const [profileSection, setProfileSection] = useState<ProfileSection>('films');
+  const [filmFilter, setFilmFilter] = useState<FilmFilter>('watched');
 
   const visibleMovies = useMemo(() => {
-    if (profileTab === 'all') {
+    if (profileSection !== 'films') {
+      return movies;
+    }
+
+    if (filmFilter === 'all') {
       return movies;
     }
 
     return movies.filter((movie) => (movie.total_avaliacoes ?? 0) > 0 || (movie.reviews?.length ?? 0) > 0);
-  }, [movies, profileTab]);
+  }, [movies, profileSection, filmFilter]);
 
   const {
     createMovie,
@@ -105,27 +110,49 @@ function App() {
       </header>
 
       <main className="app-shell">
-        <ProfileStrip profileTab={profileTab} onTabChange={setProfileTab} />
+        <ProfileStrip
+          profileSection={profileSection}
+          filmFilter={filmFilter}
+          onSectionChange={setProfileSection}
+          onFilmFilterChange={setFilmFilter}
+        />
 
         <section className="panel-grid">
           <aside className="panel left-panel">
             <div className="panel-header">
-              <h2>Catálogo</h2>
-              <SearchBar value={search} onChange={setSearch} />
+              <h2>
+                {profileSection === 'films' && 'Catálogo'}
+                {profileSection === 'diary' && 'Diário'}
+                {profileSection === 'reviews' && 'Resenhas'}
+                {profileSection === 'lists' && 'Listas'}
+              </h2>
+              {profileSection === 'films' && <SearchBar value={search} onChange={setSearch} />}
             </div>
 
-            <MovieList
-              movies={visibleMovies}
-              selectedMovieId={selectedMovieId}
-              onSelectMovie={setSelectedMovieId}
-              loading={loadingMovies}
-              error={moviesError}
-            />
+            {profileSection === 'films' ? (
+              <>
+                <MovieList
+                  movies={visibleMovies}
+                  selectedMovieId={selectedMovieId}
+                  onSelectMovie={setSelectedMovieId}
+                  loading={loadingMovies}
+                  error={moviesError}
+                />
 
-            {hasMore && !loadingMovies && (
-              <button type="button" className="primary-button" onClick={() => loadMore()}>
-                Carregar mais
-              </button>
+                {hasMore && !loadingMovies && (
+                  <button type="button" className="primary-button" onClick={() => loadMore()}>
+                    Carregar mais
+                  </button>
+                )}
+              </>
+            ) : (
+              <div className="empty-section">
+                <p>
+                  {profileSection === 'diary' && 'A linha do tempo do diário será exibida aqui.'}
+                  {profileSection === 'reviews' && 'As resenhas do usuário aparecerão aqui.'}
+                  {profileSection === 'lists' && 'As listas criadas pelo usuário aparecerão aqui.'}
+                </p>
+              </div>
             )}
           </aside>
 

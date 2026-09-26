@@ -169,16 +169,29 @@ button {
   color: var(--letterboxd-white);
 }
 
+.profile-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  gap: 16px;
+  min-width: 0;
+}
 
-.profile-tabs {
+.profile-main-tabs,
+.profile-subtabs {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px 16px;
+  gap: 12px 18px;
+}
+
+.profile-subtabs {
   margin-left: auto;
 }
 
-.tab-button {
+.tab-button,
+.subtab-button {
   appearance: none;
   border: 0;
   background: transparent;
@@ -191,11 +204,18 @@ button {
   cursor: pointer;
 }
 
-.tab-button.tab-active {
+.subtab-button {
+  font-size: 0.72rem;
+  padding: 0 0 4px;
+}
+
+.tab-button.tab-active,
+.subtab-button.subtab-active {
   color: var(--letterboxd-white);
 }
 
-.tab-button.tab-active::after {
+.tab-button.tab-active::after,
+.subtab-button.subtab-active::after {
   content: '';
   position: absolute;
   left: 0;
@@ -203,6 +223,18 @@ button {
   bottom: -2px;
   height: 2px;
   background: var(--letterboxd-green);
+}
+
+.empty-section {
+  display: grid;
+  place-items: center;
+  min-height: 180px;
+  border: 1px dashed var(--letterboxd-border);
+  border-radius: 12px;
+  color: var(--letterboxd-text-soft);
+  background: rgba(255, 255, 255, 0.01);
+  padding: 24px;
+  text-align: center;
 }
 
 .panel-grid {

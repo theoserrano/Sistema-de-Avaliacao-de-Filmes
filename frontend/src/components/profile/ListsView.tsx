@@ -95,6 +95,11 @@ export function ListsView({ movies, profileName }: ListsViewProps) {
     setSelectedMovieIds([]);
   };
 
+  const removeList = (listId: string, listTitle: string) => {
+    if (!window.confirm(`Deseja realmente excluir a lista "${listTitle}"?`)) return;
+    setLists((current) => current.filter((list) => list.id !== listId));
+  };
+
   return (
     <div className="lists-layout">
       <form className="list-form" onSubmit={createList}>
@@ -124,7 +129,18 @@ export function ListsView({ movies, profileName }: ListsViewProps) {
       <div className="lists-grid">
         {profileLists.length === 0 ? <div className="empty-section"><p>Nenhuma lista criada por {profileName}.</p></div> : profileLists.map((list) => (
           <article key={list.id} className="list-card">
-            <h3>{list.title}</h3>
+            <div className="list-card-header">
+              <h3>{list.title}</h3>
+              <button
+                type="button"
+                className="danger-button list-delete-button"
+                onClick={() => removeList(list.id, list.title)}
+                aria-label={`Excluir lista ${list.title}`}
+                title="Remover lista"
+              >
+                🗑
+              </button>
+            </div>
             {list.description && <p>{list.description}</p>}
             <ul>
               {list.movieIds.map((movieId) => {

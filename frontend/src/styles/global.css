@@ -670,10 +670,6 @@ button:disabled {
   background: var(--letterboxd-panel-strong);
 }
 
-.list-card h3 {
-  margin: 0 0 8px;
-  color: var(--letterboxd-white);
-}
 
 .list-card p {
   margin: 0 0 10px;
@@ -684,6 +680,29 @@ button:disabled {
   margin: 0;
   padding-left: 18px;
   color: var(--letterboxd-text);
+}
+
+.list-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.list-card-header h3 {
+  margin: 0;
+  color: var(--letterboxd-white);
+  flex: 1;
+}
+
+.list-delete-button {
+  flex-shrink: 0;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  line-height: 1;
+  cursor: pointer;
 }
 
 /* Responsividade Global */

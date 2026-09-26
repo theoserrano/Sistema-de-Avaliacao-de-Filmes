@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import './App.css';
 import logo from './assets/logo.png';
 import { MovieDetail } from './components/movies/MovieDetail';
@@ -23,6 +23,15 @@ function App() {
 
   const [selectedMovieId, setSelectedMovieId] = useState<string | null>(null);
   const [isMovieFormOpen, setIsMovieFormOpen] = useState(false);
+  const [profileTab, setProfileTab] = useState<'watched' | 'all'>('watched');
+
+  const visibleMovies = useMemo(() => {
+    if (profileTab === 'all') {
+      return movies;
+    }
+
+    return movies.filter((movie) => (movie.total_avaliacoes ?? 0) > 0 || (movie.reviews?.length ?? 0) > 0);
+  }, [movies, profileTab]);
 
   const {
     createMovie,
@@ -31,10 +40,15 @@ function App() {
   } = useMovieMutations();
 
   useEffect(() => {
-    if (!selectedMovieId && movies.length > 0) {
-      setSelectedMovieId(movies[0].sk_movie_id);
+    if (!selectedMovieId && visibleMovies.length > 0) {
+      setSelectedMovieId(visibleMovies[0].sk_movie_id);
+      return;
     }
-  }, [movies, selectedMovieId]);
+
+    if (selectedMovieId && !visibleMovies.some((movie) => movie.sk_movie_id === selectedMovieId)) {
+      setSelectedMovieId(visibleMovies[0]?.sk_movie_id ?? null);
+    }
+  }, [selectedMovieId, visibleMovies]);
 
   const handleCreateMovie = async (data: MovieCreateData) => {
     const createdMovie = await createMovie({
@@ -91,20 +105,26 @@ function App() {
 
       <main className="app-shell">
         <section className="profile-strip">
-          <div className="profile-avatar">A</div>
+          <div className="profile-avatar">S</div>
           <div className="profile-info">
-            <span className="profile-name">Arthur Tuoto</span>
-            <span className="profile-badge">PATRON</span>
+            <span className="profile-name">Seu perfil</span>
           </div>
+
           <div className="profile-tabs" aria-label="Tab de navegação do perfil">
-            <span>Activity</span>
-            <span>Films</span>
-            <span>Diary</span>
-            <span>Reviews</span>
-            <span className="tab-active">Lists</span>
-            <span>Likes</span>
-            <span>Network</span>
-            <span>Stats</span>
+            <button
+              type="button"
+              className={profileTab === 'watched' ? 'tab-button tab-active' : 'tab-button'}
+              onClick={() => setProfileTab('watched')}
+            >
+              Assistidos
+            </button>
+            <button
+              type="button"
+              className={profileTab === 'all' ? 'tab-button tab-active' : 'tab-button'}
+              onClick={() => setProfileTab('all')}
+            >
+              Todos
+            </button>
           </div>
         </section>
 
@@ -116,7 +136,7 @@ function App() {
             </div>
 
             <MovieList
-              movies={movies}
+              movies={visibleMovies}
               selectedMovieId={selectedMovieId}
               onSelectMovie={setSelectedMovieId}
               loading={loadingMovies}

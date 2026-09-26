@@ -169,19 +169,6 @@ button {
   color: var(--letterboxd-white);
 }
 
-.profile-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 224, 84, 0.15);
-  border: 1px solid rgba(0, 224, 84, 0.2);
-  color: var(--letterboxd-green);
-  border-radius: 4px;
-  padding: 3px 8px;
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
 
 .profile-tabs {
   display: flex;
@@ -189,20 +176,26 @@ button {
   flex-wrap: wrap;
   gap: 12px 16px;
   margin-left: auto;
+}
+
+.tab-button {
+  appearance: none;
+  border: 0;
+  background: transparent;
   color: var(--letterboxd-text-soft);
   font-size: 0.8rem;
-}
-
-.profile-tabs span {
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0 0 6px;
   position: relative;
-  padding-bottom: 4px;
+  cursor: pointer;
 }
 
-.profile-tabs .tab-active {
+.tab-button.tab-active {
   color: var(--letterboxd-white);
 }
 
-.profile-tabs .tab-active::after {
+.tab-button.tab-active::after {
   content: '';
   position: absolute;
   left: 0;

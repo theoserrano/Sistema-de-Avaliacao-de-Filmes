@@ -20,10 +20,15 @@ async def list_movies(
     search: Optional[str] = None,
     db: AsyncSession = Depends(get_db),
 ):
-    query = select(DimMovie).options(selectinload(DimMovie.reviews))
+    query = select(DimMovie).options(
+        selectinload(DimMovie.reviews),
+        selectinload(DimMovie.reviews_summary),
+    )
 
-    if search:
-        query = query.where(DimMovie.titulo.ilike(f"%{search}%"))
+    normalized_search = (search or "").strip()
+
+    if normalized_search:
+        query = query.where(DimMovie.titulo.ilike(f"%{normalized_search}%"))
 
     query = query.offset(skip).limit(limit)
     result = await db.execute(query)
@@ -31,9 +36,16 @@ async def list_movies(
 
     for movie in movies:
         reviews = movie.reviews or []
-        total = len(reviews)
-        movie.total_avaliacoes = total
-        movie.media_avaliacoes = round(sum(r.nota for r in reviews) / total, 2) if total > 0 else 0.0
+        if reviews:
+            total = len(reviews)
+            movie.total_avaliacoes = total
+            movie.media_avaliacoes = round(sum(r.nota for r in reviews) / total, 2)
+        elif movie.reviews_summary:
+            movie.total_avaliacoes = movie.reviews_summary.qtd_avaliacoes_usuarios or 0
+            movie.media_avaliacoes = movie.reviews_summary.nota_media_usuarios or 0.0
+        else:
+            movie.total_avaliacoes = 0
+            movie.media_avaliacoes = 0.0
 
     return movies
 
@@ -43,7 +55,10 @@ async def list_movies(
 async def get_movie(sk_movie_id: str, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
         select(DimMovie)
-        .options(selectinload(DimMovie.reviews))
+        .options(
+            selectinload(DimMovie.reviews),
+            selectinload(DimMovie.reviews_summary),
+        )
         .where(DimMovie.sk_movie_id == sk_movie_id)
     )
     movie = result.scalar_one_or_none()
@@ -55,9 +70,16 @@ async def get_movie(sk_movie_id: str, db: AsyncSession = Depends(get_db)):
         )
 
     reviews = movie.reviews or []
-    total = len(reviews)
-    movie.total_avaliacoes = total
-    movie.media_avaliacoes = round(sum(r.nota for r in reviews) / total, 2) if total > 0 else 0.0
+    if reviews:
+        total = len(reviews)
+        movie.total_avaliacoes = total
+        movie.media_avaliacoes = round(sum(r.nota for r in reviews) / total, 2)
+    elif movie.reviews_summary:
+        movie.total_avaliacoes = movie.reviews_summary.qtd_avaliacoes_usuarios or 0
+        movie.media_avaliacoes = movie.reviews_summary.nota_media_usuarios or 0.0
+    else:
+        movie.total_avaliacoes = 0
+        movie.media_avaliacoes = 0.0
 
     return movie
 

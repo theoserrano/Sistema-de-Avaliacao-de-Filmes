@@ -34,10 +34,76 @@ def parse_decimal(val: str):
 
 async def seed():
     async with AsyncSessionLocal() as session:
-        # Trava de segurança para não duplicar dados
         check = await session.execute(select(DimMovie))
         if check.scalars().first():
-            print("O banco de dados já contém registros. Carga cancelada.")
+            movie_ids = set(
+                (await session.execute(select(DimMovie.sk_movie_id))).scalars().all()
+            )
+            existing_review_ids = set(
+                (await session.execute(select(MovieReview.sk_movie_review_id))).scalars().all()
+            )
+            existing_summary_ids = set(
+                (await session.execute(select(DimReview.sk_review_id))).scalars().all()
+            )
+            existing_summary_movie_ids = set(
+                (await session.execute(select(DimReview.sk_movie_id))).scalars().all()
+            )
+
+            review_inserted = review_skipped = review_orphans = 0
+            seen_review_ids = set(existing_review_ids)
+            with open(DATA_DIR / "movies_reviews.csv", mode="r", encoding="utf-8") as f:
+                for r in csv.DictReader(f):
+                    if r["sk_movie_id"] not in movie_ids:
+                        review_orphans += 1
+                    elif r["sk_movie_review_id"] in seen_review_ids:
+                        review_skipped += 1
+                    else:
+                        session.add(MovieReview(
+                            sk_movie_review_id=r["sk_movie_review_id"],
+                            sk_movie_id=r["sk_movie_id"],
+                            nome=r["nome"],
+                            nota=parse_float(r["nota"]),
+                            comentario=r["comentario"]
+                        ))
+                        seen_review_ids.add(r["sk_movie_review_id"])
+                        review_inserted += 1
+
+            summary_inserted = summary_skipped = summary_orphans = 0
+            seen_summary_ids = set(existing_summary_ids)
+            seen_summary_movie_ids = set(existing_summary_movie_ids)
+            with open(DATA_DIR / "dim_reviews.csv", mode="r", encoding="utf-8") as f:
+                for r in csv.DictReader(f):
+                    if r["sk_movie_id"] not in movie_ids:
+                        summary_orphans += 1
+                    elif (
+                        r["sk_review_id"] in seen_summary_ids
+                        or r["sk_movie_id"] in seen_summary_movie_ids
+                    ):
+                        summary_skipped += 1
+                    else:
+                        session.add(DimReview(
+                            sk_review_id=r["sk_review_id"],
+                            sk_movie_id=r["sk_movie_id"],
+                            qtd_avaliacoes_usuarios=parse_int(
+                                r.get("qtd_avaliacoes_usuarios")
+                            ) or 0,
+                            nota_media_usuarios=parse_float(r.get("nota_media_usuarios"))
+                        ))
+                        seen_summary_ids.add(r["sk_review_id"])
+                        seen_summary_movie_ids.add(r["sk_movie_id"])
+                        summary_inserted += 1
+
+            await session.commit()
+            print(
+                "Reparo de movie_reviews: "
+                f"inseridos={review_inserted}, ignorados={review_skipped}, "
+                f"órfãos={review_orphans}"
+            )
+            print(
+                "Reparo de dim_reviews: "
+                f"inseridos={summary_inserted}, ignorados={summary_skipped}, "
+                f"órfãos={summary_orphans}"
+            )
             return
 
         print("Lendo e inserindo dimensões...")

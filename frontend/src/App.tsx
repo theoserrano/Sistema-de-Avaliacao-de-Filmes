@@ -6,10 +6,35 @@ import { MovieForm } from './components/movies/MovieForm';
 import { MovieList } from './components/movies/MovieList';
 import { SearchBar } from './components/movies/SearchBar';
 import { DiaryTimeline } from './components/ui/DiaryTimeline';
-import { ProfileStrip, type FilmFilter, type ProfileSection } from './components/ui/ProfileStrip';
+import { ProfileStrip, type ProfileSection } from './components/ui/ProfileStrip';
 import { useMovieMutations } from './hooks/useMovieMutations';
 import { useMovies } from './hooks/useMovies';
-import type { MovieCreateData } from './types/movie';
+import { ListsView } from './components/profile/ListsView';
+import type { Movie, MovieCreateData } from './types/movie';
+
+interface WatchlistRecord {
+  ownerProfile: string;
+  movieIds: string[];
+}
+
+const WATCHLIST_STORAGE_KEY = 'theoboxd-watchlists';
+
+function readWatchlists(): WatchlistRecord[] {
+  try {
+    const stored = localStorage.getItem(WATCHLIST_STORAGE_KEY);
+    const parsed: unknown = stored ? JSON.parse(stored) : [];
+    return Array.isArray(parsed)
+      ? parsed.filter((item): item is WatchlistRecord => (
+        typeof item === 'object' && item !== null &&
+        typeof (item as WatchlistRecord).ownerProfile === 'string' &&
+        Array.isArray((item as WatchlistRecord).movieIds) &&
+        (item as WatchlistRecord).movieIds.every((movieId) => typeof movieId === 'string')
+      ))
+      : [];
+  } catch {
+    return [];
+  }
+}
 
 function App() {
   const {
@@ -26,24 +51,80 @@ function App() {
   const [selectedMovieId, setSelectedMovieId] = useState<string | null>(null);
   const [isMovieFormOpen, setIsMovieFormOpen] = useState(false);
   const [profileSection, setProfileSection] = useState<ProfileSection>('films');
-  const [filmFilter, setFilmFilter] = useState<FilmFilter>('watched');
+  const [profileName, setProfileName] = useState('Usuário');
+  const [historyMovies, setHistoryMovies] = useState<Movie[]>([]);
+  const [watchlists, setWatchlists] = useState<WatchlistRecord[]>(readWatchlists);
 
-  const visibleMovies = useMemo(() => {
-    if (profileSection !== 'films') {
-      return movies;
+  useEffect(() => {
+    try {
+      localStorage.setItem(WATCHLIST_STORAGE_KEY, JSON.stringify(watchlists));
+    } catch {
+    }
+  }, [watchlists]);
+
+  useEffect(() => {
+    if (movies.length === 0) {
+      return;
     }
 
-    if (filmFilter === 'all') {
-      return movies;
-    }
+    setHistoryMovies((previousMovies) => {
+      const mergedMovies = new Map(previousMovies.map((movie) => [movie.sk_movie_id, movie]));
+      let hasChanges = false;
 
-    return movies.filter((movie) => (movie.total_avaliacoes ?? 0) > 0 || (movie.reviews?.length ?? 0) > 0);
-  }, [movies, profileSection, filmFilter]);
+      movies.forEach((movie) => {
+        if (mergedMovies.get(movie.sk_movie_id) !== movie) {
+          mergedMovies.set(movie.sk_movie_id, movie);
+          hasChanges = true;
+        }
+      });
 
-  const diaryEntries = useMemo(() => {
-    return movies
+      return hasChanges ? Array.from(mergedMovies.values()) : previousMovies;
+    });
+  }, [movies]);
+
+  const visibleMovies = movies;
+  const availableMovies = useMemo(() => {
+    const mergedMovies = new Map(historyMovies.map((movie) => [movie.sk_movie_id, movie]));
+    movies.forEach((movie) => mergedMovies.set(movie.sk_movie_id, movie));
+    return Array.from(mergedMovies.values());
+  }, [historyMovies, movies]);
+
+  const activeWatchlistIds = useMemo(
+    () => watchlists.find((watchlist) => watchlist.ownerProfile === profileName)?.movieIds ?? [],
+    [profileName, watchlists],
+  );
+
+  const activeWatchlistMovies = useMemo(
+    () => activeWatchlistIds
+      .map((movieId) => availableMovies.find((movie) => movie.sk_movie_id === movieId))
+      .filter((movie): movie is Movie => Boolean(movie)),
+    [activeWatchlistIds, availableMovies],
+  );
+
+  const isMovieInWatchlist = (movieId: string) => activeWatchlistIds.includes(movieId);
+
+  const handleToggleWatchlist = (movieId: string) => {
+    setWatchlists((current) => {
+      const currentIds = current.find((watchlist) => watchlist.ownerProfile === profileName)?.movieIds ?? [];
+      const nextIds = currentIds.includes(movieId)
+        ? currentIds.filter((id) => id !== movieId)
+        : [...currentIds, movieId];
+      const withoutProfile = current.filter((watchlist) => watchlist.ownerProfile !== profileName);
+
+      return nextIds.length > 0
+        ? [...withoutProfile, { ownerProfile: profileName, movieIds: nextIds }]
+        : withoutProfile;
+    });
+  };
+
+  const userReviewEntries = useMemo(() => {
+    const normalizedProfileName = profileName.trim().toLowerCase();
+
+    return historyMovies
       .flatMap((movie) => {
-        const reviews = movie.reviews ?? [];
+        const reviews = (movie.reviews ?? []).filter(
+          (review) => review.nome.trim().toLowerCase() === normalizedProfileName,
+        );
 
         return reviews.map((review) => ({
           movieId: movie.sk_movie_id,
@@ -54,7 +135,7 @@ function App() {
         }));
       })
       .sort((a, b) => new Date(b.review.created_at).getTime() - new Date(a.review.created_at).getTime());
-  }, [movies]);
+  }, [historyMovies, profileName]);
 
   const {
     createMovie,
@@ -112,10 +193,10 @@ function App() {
 
       <main className="app-shell">
         <ProfileStrip
+          profileName={profileName}
           profileSection={profileSection}
-          filmFilter={filmFilter}
           onSectionChange={setProfileSection}
-          onFilmFilterChange={setFilmFilter}
+          onProfileNameChange={setProfileName}
         />
 
         {profileSection === 'films' ? (
@@ -142,7 +223,13 @@ function App() {
             </aside>
 
             <section className="panel detail-panel">
-              <MovieDetail selectedMovieId={selectedMovieId} onDeleteMovie={handleDeleteMovie} />
+              <MovieDetail
+                profileName={profileName}
+                selectedMovieId={selectedMovieId}
+                onDeleteMovie={handleDeleteMovie}
+                isMovieInWatchlist={isMovieInWatchlist}
+                onToggleWatchlist={handleToggleWatchlist}
+              />
             </section>
 
             <aside className="panel right-panel">
@@ -165,21 +252,35 @@ function App() {
             <div className="panel-header">
               <h2>
                 {profileSection === 'diary' && 'Diário'}
-                {profileSection === 'reviews' && 'Resenhas'}
+                {profileSection === 'watchlist' && 'Watchlist'}
                 {profileSection === 'lists' && 'Listas'}
               </h2>
             </div>
 
             {profileSection === 'diary' ? (
-              <DiaryTimeline entries={diaryEntries} />
-            ) : profileSection === 'reviews' ? (
-              <div className="empty-section">
-                <p>As resenhas do usuário aparecerão aqui.</p>
-              </div>
+              <DiaryTimeline entries={userReviewEntries} profileName={profileName} />
+            ) : profileSection === 'watchlist' ? (
+              activeWatchlistMovies.length === 0 ? (
+                <div className="empty-section"><p>Nenhum filme salvo na Watchlist de {profileName}.</p></div>
+              ) : (
+                <div className="watchlist-grid">
+                  {activeWatchlistMovies.map((movie) => (
+                    <article key={movie.sk_movie_id} className="watchlist-card">
+                      <img
+                        src={movie.url_poster || 'https://placehold.co/300x450/1b252d/ffffff?text=Poster'}
+                        alt={`Poster do filme ${movie.titulo}`}
+                        className="watchlist-poster"
+                      />
+                      <div>
+                        <h3>{movie.titulo}</h3>
+                        {movie.ano_lancamento && <span>{movie.ano_lancamento}</span>}
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )
             ) : (
-              <div className="empty-section">
-                <p>As listas criadas pelo usuário aparecerão aqui.</p>
-              </div>
+              <ListsView movies={visibleMovies} profileName={profileName} />
             )}
           </section>
         )}

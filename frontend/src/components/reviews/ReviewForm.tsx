@@ -3,12 +3,12 @@ import type { ReviewCreateData } from '../../types/movie';
 
 interface ReviewFormProps {
   movieId: string;
+  profileName: string;
   onSubmit: (movieId: string, data: ReviewCreateData) => Promise<void>;
   loading: boolean;
 }
 
-export const ReviewForm: React.FC<ReviewFormProps> = ({ movieId, onSubmit, loading }) => {
-  const [nome, setNome] = useState('');
+export const ReviewForm: React.FC<ReviewFormProps> = ({ movieId, profileName, onSubmit, loading }) => {
   const [nota, setNota] = useState<number>(10);
   const [comentario, setComentario] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -17,14 +17,13 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({ movieId, onSubmit, loadi
     e.preventDefault();
     setError(null);
 
-    if (!nome.trim() || !comentario.trim()) {
+    if (!profileName.trim() || !comentario.trim()) {
       setError('Por favor, preencha todos os campos.');
       return;
     }
 
     try {
-      await onSubmit(movieId, { nome, nota, comentario });
-      setNome('');
+      await onSubmit(movieId, { nome: profileName, nota, comentario });
       setNota(10);
       setComentario('');
     } catch (err: any) {
@@ -41,9 +40,9 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({ movieId, onSubmit, loadi
         <input
           type="text"
           placeholder="Seu nome"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
-          disabled={loading}
+          value={profileName}
+          readOnly
+          disabled
           required
         />
         <input

@@ -11,13 +11,14 @@ export interface DiaryEntry {
 
 interface DiaryTimelineProps {
   entries: DiaryEntry[];
+  profileName: string;
 }
 
-export function DiaryTimeline({ entries }: DiaryTimelineProps) {
+export function DiaryTimeline({ entries, profileName }: DiaryTimelineProps) {
   if (entries.length === 0) {
     return (
       <div className="empty-section">
-        <p>Nenhuma avaliação no diário ainda.</p>
+        <p>Nenhuma avaliação de {profileName} no diário ainda.</p>
       </div>
     );
   }

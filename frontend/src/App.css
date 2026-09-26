@@ -164,6 +164,23 @@ button {
   min-width: 220px;
 }
 
+.profile-editor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-name-input {
+  width: min(190px, 36vw);
+  padding: 7px 9px;
+}
+
+.profile-edit-button,
+.profile-save-button {
+  padding: 7px 10px;
+  font-size: 0.68rem;
+}
+
 .profile-name {
   font-size: 1.2rem;
   font-weight: 700;
@@ -185,6 +202,11 @@ button {
   align-items: center;
   flex-wrap: wrap;
   gap: 12px 18px;
+}
+
+.profile-main-tabs {
+  justify-content: flex-start;
+  width: 100%;
 }
 
 .profile-subtabs {
@@ -814,5 +836,202 @@ button:disabled {
   .detail-poster {
     width: 100%;
     max-width: 260px;
+  }
+}
+
+.user-reviews-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.user-review-card {
+  display: flex;
+  gap: 20px;
+  background: var(--letterboxd-panel-strong);
+  border: 1px solid var(--letterboxd-border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.user-review-poster {
+  width: 90px;
+  height: 135px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.user-review-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.user-review-header h3 {
+  margin: 0;
+  display: inline-block;
+  margin-right: 8px;
+  font-size: 1.2rem;
+  color: var(--letterboxd-white);
+}
+
+.user-review-year {
+  color: var(--letterboxd-text-soft);
+  font-size: 0.95rem;
+}
+
+.user-review-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--letterboxd-text-soft);
+  font-size: 0.88rem;
+}
+
+.user-review-score {
+  color: var(--letterboxd-green);
+  font-weight: 600;
+}
+
+.user-review-comment {
+  margin: 8px 0;
+  color: var(--letterboxd-text);
+  line-height: 1.5;
+}
+
+.user-review-author {
+  font-size: 0.8rem;
+  color: var(--letterboxd-text-soft);
+  font-style: italic;
+}
+
+.lists-layout {
+  display: grid;
+  grid-template-columns: minmax(250px, 0.7fr) minmax(0, 1.3fr);
+  gap: 22px;
+}
+
+.list-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--letterboxd-border);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.list-form h3 {
+  margin: 0;
+}
+
+.movie-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 260px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid var(--letterboxd-border);
+  border-radius: 10px;
+}
+
+.movie-picker legend {
+  padding: 0 4px;
+  color: var(--letterboxd-text-soft);
+  font-size: 0.8rem;
+}
+
+.watchlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.watchlist-card {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--letterboxd-border);
+  border-radius: 12px;
+  background: var(--letterboxd-panel-strong);
+}
+
+.watchlist-poster {
+  width: 58px;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 7px;
+}
+
+.watchlist-card h3 {
+  margin: 0;
+  color: var(--letterboxd-white);
+  font-size: 1rem;
+}
+
+.watchlist-card span {
+  color: var(--letterboxd-text-soft);
+  font-size: 0.8rem;
+}
+
+.movie-picker-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--letterboxd-text);
+  font-size: 0.88rem;
+}
+
+.movie-picker-option input {
+  width: auto;
+}
+
+.lists-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  align-content: start;
+  gap: 14px;
+}
+
+.list-card {
+  padding: 16px;
+  border: 1px solid var(--letterboxd-border);
+  border-radius: 12px;
+  background: var(--letterboxd-panel-strong);
+}
+
+.list-card h3 {
+  margin: 0 0 8px;
+  color: var(--letterboxd-white);
+}
+
+.list-card p {
+  margin: 0 0 10px;
+  color: var(--letterboxd-text-soft);
+}
+
+.list-card ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--letterboxd-text);
+}
+
+@media (max-width: 760px) {
+  .lists-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-nav {
+    width: 100%;
+  }
+
+  .profile-main-tabs {
+    justify-content: space-between;
   }
 }

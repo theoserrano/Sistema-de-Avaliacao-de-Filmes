@@ -118,38 +118,60 @@ function App() {
           onFilmFilterChange={setFilmFilter}
         />
 
-        <section className={profileSection === 'films' ? 'panel-grid' : 'panel-grid panel-grid--full'}>
-          <aside className="panel left-panel">
+        {profileSection === 'films' ? (
+          <section className="panel-grid">
+            <aside className="panel left-panel">
+              <div className="panel-header">
+                <h2>Catálogo</h2>
+                <SearchBar value={search} onChange={setSearch} />
+              </div>
+
+              <MovieList
+                movies={visibleMovies}
+                selectedMovieId={selectedMovieId}
+                onSelectMovie={setSelectedMovieId}
+                loading={loadingMovies}
+                error={moviesError}
+              />
+
+              {hasMore && !loadingMovies && (
+                <button type="button" className="primary-button" onClick={() => loadMore()}>
+                  Carregar mais
+                </button>
+              )}
+            </aside>
+
+            <section className="panel detail-panel">
+              <MovieDetail selectedMovieId={selectedMovieId} onDeleteMovie={handleDeleteMovie} />
+            </section>
+
+            <aside className="panel right-panel">
+              <div className="panel-header">
+                <h2>Ações</h2>
+                <button type="button" className="primary-button" onClick={() => setIsMovieFormOpen(true)}>
+                  Cadastrar filme
+                </button>
+              </div>
+
+              <p className="panel-helper">
+                Crie um novo título em uma tela separada para manter o catálogo sempre organizado.
+              </p>
+
+              {moviesError && <p className="state-message error">{moviesError}</p>}
+            </aside>
+          </section>
+        ) : (
+          <section className="panel full-panel">
             <div className="panel-header">
               <h2>
-                {profileSection === 'films' && 'Catálogo'}
                 {profileSection === 'diary' && 'Diário'}
                 {profileSection === 'reviews' && 'Resenhas'}
                 {profileSection === 'lists' && 'Listas'}
               </h2>
-              {profileSection === 'films' && <SearchBar value={search} onChange={setSearch} />}
             </div>
 
-            {profileSection === 'films' ? (
-              <>
-                <MovieList
-                  movies={visibleMovies}
-                  selectedMovieId={selectedMovieId}
-                  onSelectMovie={setSelectedMovieId}
-                  loading={loadingMovies}
-                  error={moviesError}
-                />
-
-                {hasMore && !loadingMovies && (
-                  <button type="button" className="primary-button" onClick={() => loadMore()}>
-                    Carregar mais
-                  </button>
-                )}
-              </>
-            ) : profileSection === 'diary' ? (
-              <div className="diary-panel-content">
-                <DiaryTimeline entries={diaryEntries} />
-              </div>
+            {profileSection === 'diary' ? (
+              <DiaryTimeline entries={diaryEntries} />
             ) : profileSection === 'reviews' ? (
               <div className="empty-section">
                 <p>As resenhas do usuário aparecerão aqui.</p>
@@ -159,31 +181,8 @@ function App() {
                 <p>As listas criadas pelo usuário aparecerão aqui.</p>
               </div>
             )}
-          </aside>
-
-          {profileSection === 'films' && (
-            <>
-              <section className="panel detail-panel">
-                <MovieDetail selectedMovieId={selectedMovieId} onDeleteMovie={handleDeleteMovie} />
-              </section>
-
-              <aside className="panel right-panel">
-                <div className="panel-header">
-                  <h2>Ações</h2>
-                  <button type="button" className="primary-button" onClick={() => setIsMovieFormOpen(true)}>
-                    Cadastrar filme
-                  </button>
-                </div>
-
-                <p className="panel-helper">
-                  Crie um novo título em uma tela separada para manter o catálogo sempre organizado.
-                </p>
-
-                {moviesError && <p className="state-message error">{moviesError}</p>}
-              </aside>
-            </>
-          )}
-        </section>
+          </section>
+        )}
       </main>
 
       {isMovieFormOpen && (

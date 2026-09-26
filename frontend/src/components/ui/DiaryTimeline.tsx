@@ -13,20 +13,6 @@ interface DiaryTimelineProps {
   entries: DiaryEntry[];
 }
 
-function formatDiaryDate(dateString: string) {
-  const date = new Date(dateString);
-
-  if (Number.isNaN(date.getTime())) {
-    return 'Sem data';
-  }
-
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  }).format(date).toUpperCase();
-}
-
 export function DiaryTimeline({ entries }: DiaryTimelineProps) {
   if (entries.length === 0) {
     return (
@@ -39,17 +25,17 @@ export function DiaryTimeline({ entries }: DiaryTimelineProps) {
   return (
     <div className="diary-list">
       {entries.map((entry) => {
-        const formattedDate = formatDiaryDate(entry.review.created_at);
         const movieRating = Number(entry.review.nota ?? 0);
+        const reviewDate = new Date(entry.review.created_at);
 
         return (
           <article key={`${entry.movieId}-${entry.review.sk_movie_review_id}`} className="diary-item">
             <div className="diary-date-box">
-              <span className="diary-date-day">{new Date(entry.review.created_at).getDate().toString().padStart(2, '0')}</span>
+              <span className="diary-date-day">{reviewDate.getDate().toString().padStart(2, '0')}</span>
               <span className="diary-date-month">
-                {new Intl.DateTimeFormat('pt-BR', { month: 'short' }).format(new Date(entry.review.created_at)).toUpperCase()}
+                {new Intl.DateTimeFormat('pt-BR', { month: 'short' }).format(reviewDate).toUpperCase()}
               </span>
-              <span className="diary-date-year">{new Date(entry.review.created_at).getFullYear()}</span>
+              <span className="diary-date-year">{reviewDate.getFullYear()}</span>
             </div>
 
             <img className="diary-poster" src={entry.poster} alt={`Poster do filme ${entry.movieTitle}`} />
@@ -57,7 +43,7 @@ export function DiaryTimeline({ entries }: DiaryTimelineProps) {
             <div className="diary-content">
               <div className="diary-header-row">
                 <h3>{entry.movieTitle}</h3>
-                <span className="diary-year">{entry.movieYear || 'Sem ano'}</span>
+                <span className="diary-year">({entry.movieYear || 'N/A'})</span>
               </div>
 
               <div className="diary-meta-row">
@@ -65,7 +51,9 @@ export function DiaryTimeline({ entries }: DiaryTimelineProps) {
                 <span className="diary-score">{movieRating.toFixed(1)}/10</span>
               </div>
 
-              <p className="diary-timestamp">{formattedDate}</p>
+              {entry.review.comentario && (
+                <p className="diary-comment">"{entry.review.comentario}"</p>
+              )}
             </div>
           </article>
         );

@@ -5,23 +5,28 @@ interface MovieMetaProps {
 }
 
 export function MovieMeta({ movie }: MovieMetaProps) {
+  const poster = movie.url_poster || 'https://placehold.co/400x600/1b252d/ffffff?text=Poster';
+
   return (
     <div className="detail-header">
-      {movie.url_poster && (
-        <img src={movie.url_poster} alt={`Poster do filme ${movie.titulo}`} />
-      )}
+      <div className="detail-poster-wrap">
+        <img className="detail-poster" src={poster} alt={`Poster do filme ${movie.titulo}`} />
+        <span className="detail-score-badge">
+          {movie.media_avaliacoes != null ? `${movie.media_avaliacoes.toFixed(1)} ★` : 'N/A'}
+        </span>
+      </div>
 
-      <div>
+      <div className="detail-copy">
         <p className="eyebrow">{movie.id_filme}</p>
         <h2>{movie.titulo}</h2>
-        <p>{movie.sinopse || 'Sem sinopse disponível.'}</p>
 
         <div className="meta-row">
           <span>{movie.ano_lancamento || 'Sem ano'}</span>
           <span>{movie.duracao_minutos ? `${movie.duracao_minutos} min` : 'Sem duração'}</span>
-          <span>{movie.media_avaliacoes != null ? `${movie.media_avaliacoes.toFixed(1)} ★` : 'N/A ★'}</span>
           <span>{movie.total_avaliacoes ?? 0} avaliações</span>
         </div>
+
+        <p className="movie-synopsis">{movie.sinopse || 'Sem sinopse disponível.'}</p>
       </div>
     </div>
   );

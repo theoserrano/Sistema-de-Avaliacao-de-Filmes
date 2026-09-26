@@ -22,9 +22,11 @@ export function ReviewList({ reviews, loading, error }: ReviewListProps) {
   return (
     <ul className="review-list">
       {reviews.map((review) => (
-        <li key={review.sk_movie_review_id}>
-          <strong>{review.nome}</strong>
-          <span>★ {review.nota.toFixed(1)}/10</span>
+        <li key={review.sk_movie_review_id} className="review-item">
+          <div className="review-item-header">
+            <strong>{review.nome}</strong>
+            <span className="review-score">★ {review.nota.toFixed(1)}/10</span>
+          </div>
           <p>{review.comentario}</p>
         </li>
       ))}

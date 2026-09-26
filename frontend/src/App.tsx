@@ -5,6 +5,7 @@ import { MovieDetail } from './components/movies/MovieDetail';
 import { MovieForm } from './components/movies/MovieForm';
 import { MovieList } from './components/movies/MovieList';
 import { SearchBar } from './components/movies/SearchBar';
+import { DiaryTimeline } from './components/ui/DiaryTimeline';
 import { ProfileStrip, type FilmFilter, type ProfileSection } from './components/ui/ProfileStrip';
 import { useMovieMutations } from './hooks/useMovieMutations';
 import { useMovies } from './hooks/useMovies';
@@ -38,6 +39,22 @@ function App() {
 
     return movies.filter((movie) => (movie.total_avaliacoes ?? 0) > 0 || (movie.reviews?.length ?? 0) > 0);
   }, [movies, profileSection, filmFilter]);
+
+  const diaryEntries = useMemo(() => {
+    return movies
+      .flatMap((movie) => {
+        const reviews = movie.reviews ?? [];
+
+        return reviews.map((review) => ({
+          movieId: movie.sk_movie_id,
+          movieTitle: movie.titulo,
+          movieYear: movie.ano_lancamento,
+          poster: movie.url_poster || 'https://placehold.co/300x450/1b252d/ffffff?text=Poster',
+          review,
+        }));
+      })
+      .sort((a, b) => new Date(b.review.created_at).getTime() - new Date(a.review.created_at).getTime());
+  }, [movies]);
 
   const {
     createMovie,
@@ -90,22 +107,6 @@ function App() {
             <img className="brand-logo" src={logo} alt="Logo Theoboxd" />
             <span className="brand-name">theoboxd</span>
           </div>
-
-          <nav className="topbar-nav" aria-label="Navegação principal">
-            <a href="#">FILMS</a>
-            <a href="#">LISTS</a>
-            <a href="#">MEMBERS</a>
-            <a href="#">JOURNAL</a>
-          </nav>
-
-          <div className="topbar-actions">
-            <button type="button" className="ghost-button" onClick={() => refreshMovies()}>
-              Atualizar
-            </button>
-            <button type="button" className="primary-button" onClick={() => setIsMovieFormOpen(true)}>
-              Adicionar filme
-            </button>
-          </div>
         </div>
       </header>
 
@@ -117,7 +118,7 @@ function App() {
           onFilmFilterChange={setFilmFilter}
         />
 
-        <section className="panel-grid">
+        <section className={profileSection === 'films' ? 'panel-grid' : 'panel-grid panel-grid--full'}>
           <aside className="panel left-panel">
             <div className="panel-header">
               <h2>
@@ -145,35 +146,43 @@ function App() {
                   </button>
                 )}
               </>
+            ) : profileSection === 'diary' ? (
+              <div className="diary-panel-content">
+                <DiaryTimeline entries={diaryEntries} />
+              </div>
+            ) : profileSection === 'reviews' ? (
+              <div className="empty-section">
+                <p>As resenhas do usuário aparecerão aqui.</p>
+              </div>
             ) : (
               <div className="empty-section">
-                <p>
-                  {profileSection === 'diary' && 'A linha do tempo do diário será exibida aqui.'}
-                  {profileSection === 'reviews' && 'As resenhas do usuário aparecerão aqui.'}
-                  {profileSection === 'lists' && 'As listas criadas pelo usuário aparecerão aqui.'}
-                </p>
+                <p>As listas criadas pelo usuário aparecerão aqui.</p>
               </div>
             )}
           </aside>
 
-          <section className="panel detail-panel">
-            <MovieDetail selectedMovieId={selectedMovieId} onDeleteMovie={handleDeleteMovie} />
-          </section>
+          {profileSection === 'films' && (
+            <>
+              <section className="panel detail-panel">
+                <MovieDetail selectedMovieId={selectedMovieId} onDeleteMovie={handleDeleteMovie} />
+              </section>
 
-          <aside className="panel right-panel">
-            <div className="panel-header">
-              <h2>Ações</h2>
-              <button type="button" className="primary-button" onClick={() => setIsMovieFormOpen(true)}>
-                Cadastrar filme
-              </button>
-            </div>
+              <aside className="panel right-panel">
+                <div className="panel-header">
+                  <h2>Ações</h2>
+                  <button type="button" className="primary-button" onClick={() => setIsMovieFormOpen(true)}>
+                    Cadastrar filme
+                  </button>
+                </div>
 
-            <p className="panel-helper">
-              Crie um novo título em uma tela separada para manter o catálogo sempre organizado.
-            </p>
+                <p className="panel-helper">
+                  Crie um novo título em uma tela separada para manter o catálogo sempre organizado.
+                </p>
 
-            {moviesError && <p className="state-message error">{moviesError}</p>}
-          </aside>
+                {moviesError && <p className="state-message error">{moviesError}</p>}
+              </aside>
+            </>
+          )}
         </section>
       </main>
 

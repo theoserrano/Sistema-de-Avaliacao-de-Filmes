@@ -27,7 +27,7 @@ export function ReviewList({ reviews, loading, error }: ReviewListProps) {
           <div className="review-item-header">
             <strong>{review.nome}</strong>
             <div className="review-score-wrap">
-              <StarRating value={review.nota / 2} max={5} size="sm" />
+              <StarRating value={review.nota} max={5} size="sm" />
               <span className="review-score">{review.nota.toFixed(1)}/10</span>
             </div>
           </div>

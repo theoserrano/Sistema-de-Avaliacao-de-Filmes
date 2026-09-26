@@ -29,7 +29,7 @@ export function MovieMeta({ movie }: MovieMetaProps) {
         </div>
 
         <div className="movie-rating-row">
-          <StarRating value={averageRating / 2} max={5} size="md" />
+          <StarRating value={averageRating} max={5} size="md" />
           <span className="movie-rating-value">{averageRating.toFixed(1)}/10</span>
         </div>
 

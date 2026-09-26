@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import type { Movie } from '../../types/movie';
+import { useMovies } from '../../hooks/useMovies';
 
 interface MovieListRecord {
   id: string;
@@ -40,6 +41,24 @@ export function ListsView({ movies, profileName }: ListsViewProps) {
   const [description, setDescription] = useState('');
   const [movieSearch, setMovieSearch] = useState('');
   const [selectedMovieIds, setSelectedMovieIds] = useState<string[]>([]);
+  const [knownMovies, setKnownMovies] = useState<Movie[]>(movies);
+  const {
+    movies: searchedMovies,
+    loading: searchLoading,
+    setSearch: setMovieApiSearch,
+  } = useMovies(movieSearch);
+
+  useEffect(() => {
+    setMovieApiSearch(movieSearch);
+  }, [movieSearch, setMovieApiSearch]);
+
+  useEffect(() => {
+    setKnownMovies((current) => {
+      const mergedMovies = new Map(current.map((movie) => [movie.sk_movie_id, movie]));
+      [...movies, ...searchedMovies].forEach((movie) => mergedMovies.set(movie.sk_movie_id, movie));
+      return Array.from(mergedMovies.values());
+    });
+  }, [movies, searchedMovies]);
 
   useEffect(() => {
     try {
@@ -49,7 +68,9 @@ export function ListsView({ movies, profileName }: ListsViewProps) {
   }, [lists]);
 
   const profileLists = lists.filter((list) => list.ownerProfile === profileName);
-  const filteredMovies = movies.filter((movie) => movie.titulo.toLowerCase().includes(movieSearch.trim().toLowerCase()));
+  const availableMovies = Array.from(new Map([...knownMovies, ...movies, ...searchedMovies].map((movie) => [movie.sk_movie_id, movie])).values());
+  const selectedMovies = availableMovies.filter((movie) => selectedMovieIds.includes(movie.sk_movie_id));
+  const movieOptions = Array.from(new Map([...searchedMovies, ...selectedMovies].map((movie) => [movie.sk_movie_id, movie])).values());
 
   const toggleMovie = (movieId: string) => {
     setSelectedMovieIds((current) => current.includes(movieId)
@@ -88,7 +109,9 @@ export function ListsView({ movies, profileName }: ListsViewProps) {
             placeholder="Buscar filmes para a lista..."
             aria-label="Buscar filmes para a lista"
           />
-          {filteredMovies.map((movie) => (
+          {searchLoading && <p className="state-message">Buscando filmes...</p>}
+          {!searchLoading && movieOptions.length === 0 && <p className="state-message">Nenhum filme encontrado.</p>}
+          {movieOptions.map((movie) => (
             <label key={movie.sk_movie_id} className="movie-picker-option">
               <input type="checkbox" checked={selectedMovieIds.includes(movie.sk_movie_id)} onChange={() => toggleMovie(movie.sk_movie_id)} />
               <span>{movie.titulo}</span>
@@ -105,7 +128,7 @@ export function ListsView({ movies, profileName }: ListsViewProps) {
             {list.description && <p>{list.description}</p>}
             <ul>
               {list.movieIds.map((movieId) => {
-                const movie = movies.find((candidate) => candidate.sk_movie_id === movieId);
+                const movie = availableMovies.find((candidate) => candidate.sk_movie_id === movieId);
                 return movie ? <li key={movieId}>{movie.titulo}</li> : null;
               })}
             </ul>

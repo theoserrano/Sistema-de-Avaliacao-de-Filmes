@@ -5,12 +5,13 @@ interface StarRatingProps {
 }
 
 export function StarRating({ value, max = 5, size = 'md' }: StarRatingProps) {
-  const normalized = Math.max(0, Math.min(max, Number.isFinite(value) ? value : 0));
-  const filled = Math.round(normalized);
+  const score = Math.max(0, Math.min(10, Number.isFinite(value) ? value : 0));
+  const filled = Math.max(0, Math.min(5, Math.ceil(score / 2)));
+  const starCount = Math.max(0, Math.min(5, max));
 
   return (
-    <span className={`star-rating star-rating--${size}`} aria-label={`Nota ${value.toFixed(1)} de ${max}`}>
-      {Array.from({ length: max }, (_, index) => {
+    <span className={`star-rating star-rating--${size}`} aria-label={`Nota ${score.toFixed(1)} de 10`}>
+      {Array.from({ length: starCount }, (_, index) => {
         const isFilled = index < filled;
 
         return (

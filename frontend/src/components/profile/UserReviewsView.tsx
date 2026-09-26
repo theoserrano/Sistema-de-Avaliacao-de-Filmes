@@ -48,7 +48,7 @@ export const UserReviewsView: React.FC<UserReviewsViewProps> = ({ entries, profi
               </div>
 
               <div className="user-review-meta">
-                <StarRating value={movieRating / 2} max={5} size="sm" />
+                <StarRating value={movieRating} max={5} size="sm" />
                 <span className="user-review-score">{movieRating.toFixed(1)}/10</span>
                 <span className="user-review-date">• {formattedDate}</span>
               </div>

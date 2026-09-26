@@ -48,7 +48,7 @@ export function DiaryTimeline({ entries, profileName }: DiaryTimelineProps) {
               </div>
 
               <div className="diary-meta-row">
-                <StarRating value={movieRating / 2} max={5} size="sm" />
+                <StarRating value={movieRating} max={5} size="sm" />
                 <span className="diary-score">{movieRating.toFixed(1)}/10</span>
               </div>
 

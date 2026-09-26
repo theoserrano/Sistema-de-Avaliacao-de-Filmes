@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useMovieDetail } from '../../hooks/useMovieDetail';
 import { useMovieMutations } from '../../hooks/useMovieMutations';
 import { ReviewForm } from '../reviews/ReviewForm';
@@ -12,11 +13,13 @@ interface MovieDetailProps {
 export function MovieDetail({ selectedMovieId, onDeleteMovie }: MovieDetailProps) {
   const { movie, reviews, loading, error, refresh } = useMovieDetail(selectedMovieId);
   const { addReview, isSubmitting } = useMovieMutations();
+  const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
 
   const handleAddReview = async (movieId: string, data: { nome: string; nota: number; comentario: string }) => {
     const addedReview = await addReview(movieId, data);
 
     if (addedReview) {
+      setIsReviewFormOpen(false);
       await refresh();
     }
   };
@@ -44,6 +47,14 @@ export function MovieDetail({ selectedMovieId, onDeleteMovie }: MovieDetailProps
       <div className="detail-actions">
         <button
           type="button"
+          className="primary-button"
+          onClick={() => setIsReviewFormOpen(true)}
+        >
+          Adicionar Resenha
+        </button>
+
+        <button
+          type="button"
           className="danger-button"
           onClick={() => onDeleteMovie(movie.sk_movie_id)}
         >
@@ -56,11 +67,24 @@ export function MovieDetail({ selectedMovieId, onDeleteMovie }: MovieDetailProps
         <ReviewList reviews={reviews} loading={loading} error={null} />
       </div>
 
-      <ReviewForm
-        movieId={selectedMovieId}
-        onSubmit={handleAddReview}
-        loading={isSubmitting}
-      />
+      {isReviewFormOpen && (
+        <div className="modal-backdrop" onClick={() => setIsReviewFormOpen(false)}>
+          <div className="modal-panel modal-panel--compact" onClick={(event) => event.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Adicionar Avaliação</h3>
+              <button type="button" className="icon-button" onClick={() => setIsReviewFormOpen(false)} aria-label="Fechar modal de avaliação">
+                ×
+              </button>
+            </div>
+
+            <ReviewForm
+              movieId={selectedMovieId}
+              onSubmit={handleAddReview}
+              loading={isSubmitting}
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 }

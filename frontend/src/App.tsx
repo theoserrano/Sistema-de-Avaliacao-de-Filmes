@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import './App.css';
+import logo from './assets/logo.png';
 import { MovieDetail } from './components/movies/MovieDetail';
 import { MovieForm } from './components/movies/MovieForm';
 import { MovieList } from './components/movies/MovieList';
@@ -21,6 +22,7 @@ function App() {
   } = useMovies('');
 
   const [selectedMovieId, setSelectedMovieId] = useState<string | null>(null);
+  const [isMovieFormOpen, setIsMovieFormOpen] = useState(false);
 
   const {
     createMovie,
@@ -43,6 +45,7 @@ function App() {
     if (createdMovie) {
       console.log('[App] filme criado com sucesso', createdMovie);
       setSelectedMovieId(createdMovie.sk_movie_id);
+      setIsMovieFormOpen(false);
       await refreshMovies();
     }
   };
@@ -63,11 +66,9 @@ function App() {
     <>
       <header className="topbar-shell">
         <div className="topbar-inner">
-          <div className="brand" aria-label="Letterboxd style brand">
-            <span className="brand-mark brand-mark--1" />
-            <span className="brand-mark brand-mark--2" />
-            <span className="brand-mark brand-mark--3" />
-            <span className="brand-name">Letterboxd</span>
+          <div className="brand" aria-label="Theoboxd brand">
+            <img className="brand-logo" src={logo} alt="Logo Theoboxd" />
+            <span className="brand-name">theoboxd</span>
           </div>
 
           <nav className="topbar-nav" aria-label="Navegação principal">
@@ -77,9 +78,14 @@ function App() {
             <a href="#">JOURNAL</a>
           </nav>
 
-          <button type="button" className="ghost-button" onClick={() => refreshMovies()}>
-            Atualizar
-          </button>
+          <div className="topbar-actions">
+            <button type="button" className="ghost-button" onClick={() => refreshMovies()}>
+              Atualizar
+            </button>
+            <button type="button" className="primary-button" onClick={() => setIsMovieFormOpen(true)}>
+              Adicionar filme
+            </button>
+          </div>
         </div>
       </header>
 
@@ -129,11 +135,36 @@ function App() {
           </section>
 
           <aside className="panel right-panel">
-            <MovieForm onSubmit={handleCreateMovie} loading={isSubmitting} />
+            <div className="panel-header">
+              <h2>Ações</h2>
+              <button type="button" className="primary-button" onClick={() => setIsMovieFormOpen(true)}>
+                Cadastrar filme
+              </button>
+            </div>
+
+            <p className="panel-helper">
+              Crie um novo título em uma tela separada para manter o catálogo sempre organizado.
+            </p>
+
             {moviesError && <p className="state-message error">{moviesError}</p>}
           </aside>
         </section>
       </main>
+
+      {isMovieFormOpen && (
+        <div className="modal-backdrop" onClick={() => setIsMovieFormOpen(false)}>
+          <div className="modal-panel" onClick={(event) => event.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Cadastrar Novo Filme</h3>
+              <button type="button" className="icon-button" onClick={() => setIsMovieFormOpen(false)} aria-label="Fechar modal">
+                ×
+              </button>
+            </div>
+
+            <MovieForm onSubmit={handleCreateMovie} loading={isSubmitting} />
+          </div>
+        </div>
+      )}
     </>
   );
 }

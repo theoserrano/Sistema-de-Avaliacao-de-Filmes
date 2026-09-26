@@ -74,27 +74,17 @@ button {
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 11px;
+  gap: 12px;
   min-width: 220px;
 }
 
-.brand-mark {
-  display: inline-block;
-  width: 18px;
-  height: 18px;
+.brand-logo {
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-}
-
-.brand-mark--1 {
-  background: linear-gradient(135deg, #ff6f61, #ff9f43);
-}
-
-.brand-mark--2 {
-  background: linear-gradient(135deg, #8ccf7e, #2fbf71);
-}
-
-.brand-mark--3 {
-  background: linear-gradient(135deg, #ffb648, #ff7d46);
+  object-fit: cover;
+  display: block;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08);
 }
 
 .brand-name {
@@ -458,6 +448,19 @@ button:disabled {
   margin-top: 16px;
 }
 
+.movie-rating-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.movie-rating-value {
+  color: var(--letterboxd-white);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
 .movie-synopsis {
   margin-top: 18px;
   color: var(--letterboxd-text);
@@ -470,6 +473,67 @@ button:disabled {
   flex-wrap: wrap;
   gap: 12px;
   margin-top: 18px;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.panel-helper {
+  margin: 0;
+  color: var(--letterboxd-text-soft);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(5, 8, 10, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.modal-panel {
+  width: min(720px, 100%);
+  background: var(--letterboxd-panel-strong);
+  border: 1px solid var(--letterboxd-border);
+  border-radius: 18px;
+  box-shadow: var(--shadow-soft);
+  padding: 18px 18px 22px;
+}
+
+.modal-panel--compact {
+  width: min(560px, 100%);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: var(--letterboxd-white);
+  font-size: 1.45rem;
+}
+
+.icon-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--letterboxd-border);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--letterboxd-white);
+  font-size: 1.4rem;
 }
 
 .reviews-box,
@@ -500,6 +564,40 @@ button:disabled {
 
 .review-item strong {
   color: var(--letterboxd-white);
+}
+
+.review-score-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.star-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  line-height: 1;
+}
+
+.star {
+  display: inline-block;
+  font-size: 0.95rem;
+}
+
+.star--filled {
+  color: var(--letterboxd-green);
+}
+
+.star--empty {
+  color: rgba(255, 255, 255, 0.22);
+}
+
+.star-rating--sm .star {
+  font-size: 0.7rem;
+}
+
+.star-rating--md .star {
+  font-size: 0.9rem;
 }
 
 .review-score {

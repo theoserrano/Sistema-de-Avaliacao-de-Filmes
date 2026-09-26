@@ -1,4 +1,5 @@
 import type { Review } from '../../types/movie';
+import { StarRating } from '../ui/StarRating';
 
 interface ReviewListProps {
   reviews: Review[];
@@ -25,7 +26,10 @@ export function ReviewList({ reviews, loading, error }: ReviewListProps) {
         <li key={review.sk_movie_review_id} className="review-item">
           <div className="review-item-header">
             <strong>{review.nome}</strong>
-            <span className="review-score">★ {review.nota.toFixed(1)}/10</span>
+            <div className="review-score-wrap">
+              <StarRating value={review.nota / 2} max={5} size="sm" />
+              <span className="review-score">{review.nota.toFixed(1)}/10</span>
+            </div>
           </div>
           <p>{review.comentario}</p>
         </li>

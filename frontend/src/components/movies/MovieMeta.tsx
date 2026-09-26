@@ -1,4 +1,5 @@
 import type { Movie } from '../../types/movie';
+import { StarRating } from '../ui/StarRating';
 
 interface MovieMetaProps {
   movie: Movie;
@@ -6,6 +7,7 @@ interface MovieMetaProps {
 
 export function MovieMeta({ movie }: MovieMetaProps) {
   const poster = movie.url_poster || 'https://placehold.co/400x600/1b252d/ffffff?text=Poster';
+  const averageRating = movie.media_avaliacoes ?? 0;
 
   return (
     <div className="detail-header">
@@ -24,6 +26,11 @@ export function MovieMeta({ movie }: MovieMetaProps) {
           <span>{movie.ano_lancamento || 'Sem ano'}</span>
           <span>{movie.duracao_minutos ? `${movie.duracao_minutos} min` : 'Sem duração'}</span>
           <span>{movie.total_avaliacoes ?? 0} avaliações</span>
+        </div>
+
+        <div className="movie-rating-row">
+          <StarRating value={averageRating / 2} max={5} size="md" />
+          <span className="movie-rating-value">{averageRating.toFixed(1)}/10</span>
         </div>
 
         <p className="movie-synopsis">{movie.sinopse || 'Sem sinopse disponível.'}</p>

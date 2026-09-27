@@ -7,7 +7,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.router import api_router
 from app.core.config import get_settings
 from app.core.logging import configure_logging
+from app.db.base import Base
 from app.db.session import engine
+import app.movies.models  # noqa: F401 — populates Base.metadata
 
 configure_logging()
 settings = get_settings()
@@ -15,10 +17,12 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    """Libera recursos de infraestrutura quando a aplicação é encerrada."""
+    """Cria tabelas na inicialização e libera recursos ao encerrar."""
 
     del app
-    # A criação/evolução do schema é responsabilidade exclusiva do Alembic.
+    # Cria automaticamente as tabelas que ainda não existem (idempotente)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
     yield
     await engine.dispose()
 

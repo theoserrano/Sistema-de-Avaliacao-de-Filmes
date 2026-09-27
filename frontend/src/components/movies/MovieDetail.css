@@ -57,6 +57,35 @@
   font-size: 0.82rem;
 }
 
+.meta-badge {
+  background: rgba(150, 210, 130, 0.12);
+  color: var(--letterboxd-green);
+  border: 1px solid rgba(150, 210, 130, 0.25);
+  border-radius: 6px;
+  padding: 1px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.meta-label {
+  color: var(--letterboxd-green);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.movie-director {
+  margin-top: 10px;
+  font-size: 0.88rem;
+  color: var(--letterboxd-text-soft);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .movie-rating-row {
   display: flex;
   align-items: center;

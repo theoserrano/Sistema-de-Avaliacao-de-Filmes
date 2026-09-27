@@ -29,6 +29,8 @@ class MovieCreate(BaseModel):
     duracao_minutos: Optional[int] = None
     sinopse: Optional[str] = None
     url_poster: Optional[str] = None
+    diretor: Optional[str] = Field(None, max_length=255)
+    genero: Optional[str] = Field(None, max_length=255)
 
 class MovieUpdate(BaseModel):
     titulo: Optional[str] = None
@@ -37,6 +39,8 @@ class MovieUpdate(BaseModel):
     duracao_minutos: Optional[int] = None
     sinopse: Optional[str] = None
     url_poster: Optional[str] = None
+    diretor: Optional[str] = Field(None, max_length=255)
+    genero: Optional[str] = Field(None, max_length=255)
 
 class MovieResponse(BaseModel):
     sk_movie_id: str
@@ -47,6 +51,8 @@ class MovieResponse(BaseModel):
     duracao_minutos: Optional[int] = None
     sinopse: Optional[str] = None
     url_poster: Optional[str] = None
+    diretor: Optional[str] = None
+    genero: Optional[str] = None
     media_avaliacoes: Optional[float] = 0.0
     total_avaliacoes: int = 0
     reviews: List[ReviewResponse] = Field(default_factory=list)

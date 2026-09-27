@@ -14,22 +14,27 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSubmit, loading, initial
   const [duracao, setDuracao] = useState<number>(initialData?.duracao_minutos ?? 120);
   const [sinopse, setSinopse] = useState(initialData?.sinopse || '');
   const [urlPoster, setUrlPoster] = useState(initialData?.url_poster || '');
+  const [diretor, setDiretor] = useState(initialData?.diretor || '');
+  const [genero, setGenero] = useState(initialData?.genero || '');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (initialData) {
       setTitulo(initialData.titulo || '');
       setAno(initialData.ano_lancamento ?? new Date().getFullYear());
       setDuracao(initialData.duracao_minutos ?? 120);
       setSinopse(initialData.sinopse || '');
       setUrlPoster(initialData.url_poster || '');
+      setDiretor(initialData.diretor || '');
+      setGenero(initialData.genero || '');
     } else {
       setTitulo('');
       setAno(new Date().getFullYear());
       setDuracao(120);
       setSinopse('');
       setUrlPoster('');
+      setDiretor('');
+      setGenero('');
     }
     setError(null);
   }, [initialData]);
@@ -50,6 +55,8 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSubmit, loading, initial
       duracao_minutos: Number(duracao),
       sinopse,
       url_poster: urlPoster || undefined,
+      diretor: diretor.trim() || undefined,
+      genero: genero.trim() || undefined,
     };
 
     try {
@@ -61,6 +68,8 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSubmit, loading, initial
         setUrlPoster('');
         setAno(new Date().getFullYear());
         setDuracao(120);
+        setDiretor('');
+        setGenero('');
       }
     } catch (err: unknown) {
       const axiosStatus = (err as { response?: { status?: number } })?.response?.status;
@@ -109,6 +118,23 @@ export const MovieForm: React.FC<MovieFormProps> = ({ onSubmit, loading, initial
           placeholder="Duração (min)"
           value={duracao || ''}
           onChange={(e) => setDuracao(parseInt(e.target.value, 10))}
+          disabled={loading}
+        />
+      </div>
+
+      <div className="field-grid">
+        <input
+          type="text"
+          placeholder="Diretor(a)"
+          value={diretor}
+          onChange={(e) => setDiretor(e.target.value)}
+          disabled={loading}
+        />
+        <input
+          type="text"
+          placeholder="Gênero (ex: Drama, Ação)"
+          value={genero}
+          onChange={(e) => setGenero(e.target.value)}
           disabled={loading}
         />
       </div>

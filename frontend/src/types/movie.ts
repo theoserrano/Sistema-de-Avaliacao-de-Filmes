@@ -24,6 +24,8 @@ export interface Movie {
   duracao_minutos?: number;
   sinopse?: string;
   url_poster?: string;
+  diretor?: string;
+  genero?: string;
   media_avaliacoes?: number;
   total_avaliacoes?: number;
   reviews?: Review[];
@@ -38,6 +40,8 @@ export interface MovieCreateData {
   duracao_minutos?: number;
   sinopse?: string;
   url_poster?: string;
+  diretor?: string;
+  genero?: string;
 }
 
 export type MovieUpdateData = Partial<MovieCreateData>;

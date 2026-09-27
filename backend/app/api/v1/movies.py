@@ -13,7 +13,8 @@ router = APIRouter(prefix="/movies", tags=["Movies"])
 
 
 # 1. LISTAR FILMES (Com busca e média consolidada)
-@router.get("/", response_model=List[schemas.MovieResponse], status_code=status.HTTP_200_OK)
+@router.get("", response_model=List[schemas.MovieResponse], status_code=status.HTTP_200_OK)
+@router.get("/", response_model=List[schemas.MovieResponse], status_code=status.HTTP_200_OK, include_in_schema=False)
 async def list_movies(
     skip: int = 0,
     limit: int = 10,

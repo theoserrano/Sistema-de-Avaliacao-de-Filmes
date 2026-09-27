@@ -3,8 +3,9 @@ import type { Movie, MovieCreateData, MovieUpdateData, Review, ReviewCreateData 
 
 export const movieService = {
   // 1. Listar filmes (com busca e paginação)
+  // Usa barra final para evitar redirect 307 que causa erro de CORS
   async getMovies(search = '', skip = 0, limit = 10): Promise<Movie[]> {
-    const response = await api.get<Movie[]>('/movies', {
+    const response = await api.get<Movie[]>('/movies/', {
       params: { search: search || undefined, skip, limit },
     });
     return response.data;
@@ -18,7 +19,7 @@ export const movieService = {
 
   // 3. Cadastrar filme
   async createMovie(data: MovieCreateData): Promise<Movie> {
-    const response = await api.post<Movie>('/movies', data);
+    const response = await api.post<Movie>('/movies/', data);
     return response.data;
   },
 

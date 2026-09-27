@@ -9,7 +9,7 @@ interface ReviewFormProps {
 }
 
 export const ReviewForm: React.FC<ReviewFormProps> = ({ movieId, profileName, onSubmit, loading }) => {
-  const [nota, setNota] = useState<number>(10);
+  const [nota, setNota] = useState<string>('10');
   const [comentario, setComentario] = useState('');
   const [error, setError] = useState<string | null>(null);
 
@@ -17,14 +17,21 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({ movieId, profileName, on
     e.preventDefault();
     setError(null);
 
-    if (!profileName.trim() || !comentario.trim()) {
-      setError('Por favor, preencha todos os campos.');
+    const numericNota = parseFloat(nota);
+
+    if (!profileName.trim() || !comentario.trim() || isNaN(numericNota)) {
+      setError('Por favor, preencha todos os campos corretamente.');
+      return;
+    }
+
+    if (numericNota < 0 || numericNota > 10) {
+      setError('A nota deve estar entre 0 e 10.');
       return;
     }
 
     try {
-      await onSubmit(movieId, { nome: profileName, nota, comentario });
-      setNota(10);
+      await onSubmit(movieId, { nome: profileName, nota: numericNota, comentario });
+      setNota('10');
       setComentario('');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Erro ao enviar avaliação.');
@@ -49,10 +56,10 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({ movieId, profileName, on
           type="number"
           min="0"
           max="10"
-          step="0.5"
-          placeholder="Nota (0-10)"
+          step="any"
+          placeholder="Nota (0 a 10, ex: 8.5)"
           value={nota}
-          onChange={(e) => setNota(parseFloat(e.target.value))}
+          onChange={(e) => setNota(e.target.value)}
           disabled={loading}
           required
         />

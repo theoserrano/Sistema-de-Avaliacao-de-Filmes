@@ -58,18 +58,9 @@ Fluxos de cadastro de filmes e submissão de avaliações são geridos por inter
 
 ## Diferenciais Técnicos e Arquitetura
 
-### Destaques e Funcionalidades Exclusivas
-
-* **Personalização Dinâmica por Perfil:** As secções de **Watchlist**, **Diário** e **Listas** sincronizam automaticamente com o nome de utilizador configurado na aplicação.
-* **Persistência Local e Reatividade:** Dados de sessão e listas personalizadas mantêm persistência em `localStorage`, garantindo atualização em tempo real sem necessidade de reautenticação complexa.
-* **Sistema Escalar de Notas Numéricas:** Subsituição da exibição tradicional por estrelas por uma escala numérica precisa ($0.0$ a $10.0$), eliminando poluição visual na interface.
-* **Exclusão Reativa de Registos:** Remoção de filmes, listas e resenhas com atualização imediata nas visões globais e no diário.
-
----
-
 ### Arquitetura de Código e Organização
 
-A estrutura do projeto adota separação clara de responsabilidades entre backend e frontend:
+A estrutura do projeto adota uma separação clara de responsabilidades entre backend e frontend. No frontend, foi aplicado o **Page-Component Pattern**, onde cada funcionalidade ou tela possui seus componentes, estilos e suítes de teste co-localizados no mesmo módulo, facilitando a manutenibilidade, o isolamento visual e a reutilização.
 
 ```text
 Sistema-de-Avaliacao-de-Filmes/
@@ -83,8 +74,8 @@ Sistema-de-Avaliacao-de-Filmes/
 │   └── tests/            # Testes integrados com Pytest e TestClient
 └── frontend/
     ├── src/
-    │   ├── components/   # Componentes modulares (movies, profile, reviews, ui)
-    │   ├── hooks/        # Custom hooks para encapsular chamadas de API
+    │   ├── components/   # Componentes modulares organizados por visão (movies, profile, reviews, ui)
+    │   ├── hooks/        # Custom hooks para encapsular chamadas de API e estado
     │   ├── services/     # Cliente HTTP (Axios)
     │   ├── test/         # Setup de testes unitários do Vitest
     │   └── types/        # Definições globais de interfaces TypeScript
@@ -103,6 +94,7 @@ O repositório segue a especificação **Conventional Commits** para manter o hi
 * `style:` Alterações de formatação ou ajustes visuais de CSS sem impacto em lógica.
 * `test:` Adição ou ajuste de suítes de teste (ex: `test: adiciona testes unitarios com Vitest`).
 * `refactor:` Refatorações de código sem alteração de comportamento.
+* `docs:` Alterações puramente voltadas à documentação e arquivos do README (ex: `docs: adiciona capturas de tela e guia de execucao`).
 
 ---
 

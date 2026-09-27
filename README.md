@@ -10,7 +10,7 @@ O **Theoboxd** é uma plataforma full-stack inspirada no ecossistema do Letterbo
 
 A interface principal combina a navegação fluida pelo catálogo com a visualização detalhada do filme selecionado, histórico de resenhas e ações rápidas.
 
-![Banner](./readme_images/telaprincipal.png)
+![Banner](./readme_images/telaprincipal.jpg)
 
 ---
 

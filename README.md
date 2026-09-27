@@ -1,72 +1,198 @@
-# RocketLab 2026.2 — repositório base
+![Banner](./readme_images/bannertheoboxd.png)
 
-Base inicial para evoluir a atividade do RocketLab 2026.2. Ela preserva a organização do backend,
-o modelo relacional do catálogo de filmes em SQLAlchemy 2.0 e o histórico de
-migrações com Alembic, sem incluir interface, dados CSV, endpoints de negócio
-ou rotinas de carga.
+O **Theoboxd** é uma plataforma full-stack inspirada no ecossistema do Letterboxd, projetada para a gestão de catálogos cinematográficos, registo de resenhas e acompanhamento de atividades personalizadas. O projeto aplica arquitetura assíncrona no backend com FastAPI e uma interface reativa moderna construída em React, Vite e TypeScript.
 
-> **Nota:** `RocketLab` é apenas o nome de referência desta base. O diretório,
-> nome do pacote, título da API e arquivo do banco podem ser renomeados para o
-> que preferirem; eles não representam uma exigência da
-> estrutura-base.
+---
 
-## Estrutura
+## Demonstração da Aplicação
+
+### Visualização do Catálogo e Detalhes do Filme
+
+A interface principal combina a navegação fluida pelo catálogo com a visualização detalhada do filme selecionado, histórico de resenhas e ações rápidas.
+
+![Banner](./readme_images/tela1.png)
+
+---
+
+### Edição de Perfil e Associação de Dados
+
+A Watchlist, o Diário de assistidos e as Listas personalizadas são dinamicamente associados ao nome de utilizador ativo. A alteração do nome de perfil persiste os dados no ecossistema local do utilizador.
+
+![Banner](./readme_images/tela8.png)
+
+---
+
+### Modais para Criação e Edição de Conteúdo
+
+Fluxos de cadastro de filmes e submissão de avaliações são geridos por interfaces modais focadas na experiência do utilizador.
+
+#### Cadastrar Novo Filme
+
+![Banner](./readme_images/tela4.png)
+
+#### Editar Filme Existente
+
+![Banner](./readme_images/tela3.png)
+
+#### Adicionar Resenha com Nota Numérica
+
+![Banner](./readme_images/tela2.png)
+
+---
+
+### Secções de Diário, Watchlist e Listas Personalizadas
+
+#### Diário (Timeline Cronológica de Resenhas)
+
+![Banner](./readme_images/tela5.png)
+
+#### Watchlist Personalizada por Perfil
+
+![Banner](./readme_images/tela6.png)
+
+#### Gestão e Exclusão de Listas Personalizadas
+
+![Banner](./readme_images/tela7.png)
+
+---
+
+## Diferenciais Técnicos e Arquitetura
+
+### Destaques e Funcionalidades Exclusivas
+
+* **Personalização Dinâmica por Perfil:** As secções de **Watchlist**, **Diário** e **Listas** sincronizam automaticamente com o nome de utilizador configurado na aplicação.
+* **Persistência Local e Reatividade:** Dados de sessão e listas personalizadas mantêm persistência em `localStorage`, garantindo atualização em tempo real sem necessidade de reautenticação complexa.
+* **Sistema Escalar de Notas Numéricas:** Subsituição da exibição tradicional por estrelas por uma escala numérica precisa ($0.0$ a $10.0$), eliminando poluição visual na interface.
+* **Exclusão Reativa de Registos:** Remoção de filmes, listas e resenhas com atualização imediata nas visões globais e no diário.
+
+---
+
+### Arquitetura de Código e Organização
+
+A estrutura do projeto adota separação clara de responsabilidades entre backend e frontend:
 
 ```text
-.
+Sistema-de-Avaliacao-de-Filmes/
 ├── backend/
 │   ├── app/
-│   │   ├── api/v1/        # ponto de composição dos futuros routers
-│   │   ├── core/          # configurações e logging
-│   │   ├── db/            # Base ORM, engine e sessões
-│   │   └── movies/        # modelos SQLAlchemy do domínio de filmes
-│   ├── migrations/        # ambiente e revisões Alembic
-│   └── tests/
-└── README.md
+│   │   ├── api/          # Endpoints REST segregados por versão (v1)
+│   │   ├── core/         # Configurações globais e inicialização de BD
+│   │   ├── models/       # Entidades SQLAlchemy (Movie, Review)
+│   │   ├── schemas/      # Validações estritas Pydantic
+│   │   └── main.py       # Ponto de entrada FastAPI e middlewares CORS
+│   └── tests/            # Testes integrados com Pytest e TestClient
+└── frontend/
+    ├── src/
+    │   ├── components/   # Componentes modulares (movies, profile, reviews, ui)
+    │   ├── hooks/        # Custom hooks para encapsular chamadas de API
+    │   ├── services/     # Cliente HTTP (Axios)
+    │   ├── test/         # Setup de testes unitários do Vitest
+    │   └── types/        # Definições globais de interfaces TypeScript
+    └── vite.config.ts    # Configurações do bundler e ambiente de teste
+
 ```
 
-## Execução
+---
 
-Requer Python 3.11 ou superior.
+### Padrão de Commits
 
-```bash
+O repositório segue a especificação **Conventional Commits** para manter o histórico de alterações legível e auditável:
+
+* `feat:` Novas funcionalidades (ex: `feat: adiciona opcao de exclusao de listas personalizadas`).
+* `fix:` Correções de bugs (ex: `fix: corrige exportacao default no modulo principal`).
+* `style:` Alterações de formatação ou ajustes visuais de CSS sem impacto em lógica.
+* `test:` Adição ou ajuste de suítes de teste (ex: `test: adiciona testes unitarios com Vitest`).
+* `refactor:` Refatorações de código sem alteração de comportamento.
+
+---
+
+### Segurança e Robustez no Backend
+
+1. **CORS Restrito:** Middlewares configurados no FastAPI para limitar as origens permitidas em requisições cross-origin.
+2. **Validação de Schemas Pydantic:** Todas as rotas de entrada (`POST`, `PUT`) higienizam o payload, prevenindo injeções de dados maliciosos.
+3. **Mapeamento ORM Seguro:** SQLAlchemy 2.0 utilizado para parametrizar todas as consultas SQL automaticamente.
+4. **Resolução de Erros Limpa:** Tratamento centralizado de exceções para evitar a exposição de detalhes internos do banco de dados ao cliente.
+
+---
+
+### Suíte de Testes Automatizados
+
+O projeto conta com cobertura automatizada em ambas as camadas:
+
+* **Backend:** Testes funcionais com `pytest` e `httpx`/`TestClient` para validação dos códigos de status HTTP e validação de parâmetros.
+* **Frontend:** Testes unitários de componentes executados via `Vitest` e `React Testing Library`.
+
+---
+
+## Instruções de Execução
+
+### Pré-requisitos
+
+* Python 3.10+ instalado
+* Node.js 18+ e npm instalados
+
+---
+
+### 1. Configurar e Subir o Backend (FastAPI)
+
+Navegue até à pasta do backend, crie o ambiente virtual e instale as dependências:
+
+```powershell
 cd backend
-python3 -m venv .venv
-.venv/bin/pip install -e ".[dev]"
-cp .env.example .env
-.venv/bin/alembic upgrade head
-.venv/bin/uvicorn app.main:app --reload
+python -m venv .venv
+
+# Ativação no Windows (PowerShell)
+.\.venv\Scripts\Activate.ps1
+
+# Ativação no Linux/macOS
+# source .venv/bin/activate
+
+pip install -r requirements.txt
+
 ```
 
-A API mínima ficará disponível em `http://localhost:8000`; use
-`http://localhost:8000/docs` para a documentação automática. O endpoint
-`GET /health` permite conferir se a aplicação iniciou corretamente.
+Inicie o servidor de desenvolvimento:
 
-## Banco de dados e migrações
+```powershell
+uvicorn app.main:app --reload
 
-O modelo usa um esquema estrela para o catálogo de filmes:
-
-- dimensões de filmes, gêneros, pessoas, produtoras e resumo de avaliações;
-- fato de desempenho financeiro e de engajamento;
-- tabelas de associação N:N entre filmes, gêneros, produtoras e pessoas;
-
-O schema corresponde aos nove arquivos CSV atuais da camada Diamond, com a
-adição de `movie_reviews`: uma avaliação individual por linha, na escala 0–10.
-A tabela aceita diretamente as colunas `sk_movie_review_id`, `sk_movie_id`,
-`nome`, `nota` e `comentario` do CSV enviado separadamente. `created_at` é
-gerado pelo banco. O contexto generativo não faz parte desta base.
-
-O repositório não inclui CSVs nem rotinas de carga. Para usar avaliações,
-importe primeiro os filmes em `dim_movies` e depois o CSV de `movie_reviews`.
-
-As tabelas são criadas exclusivamente pelo Alembic. Para evoluir os modelos,
-crie uma revisão e aplique-a:
-
-```bash
-cd backend
-.venv/bin/alembic revision --autogenerate -m "descreva a alteração"
-.venv/bin/alembic upgrade head
 ```
 
-O banco padrão é SQLite local em `backend/rocketlab.db`. Ajuste
-`DATABASE_URL` no arquivo `.env` para usar outro banco compatível.
+O servidor backend estará disponível em `http://localhost:8000` (documentação Swagger ativa em `/docs`).
+
+---
+
+### 2. Configurar e Subir o Frontend (React / Vite)
+
+Em um novo terminal, navegue até à pasta do frontend, instale as dependências e inicie o servidor:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+
+```
+
+A aplicação web estará disponível em `http://localhost:5173`.
+
+---
+
+### 3. Executar as Suítes de Testes
+
+#### Testes do Backend (Pytest)
+
+No terminal da pasta `backend` com o `.venv` ativo:
+
+```powershell
+pytest
+
+```
+
+#### Testes do Frontend (Vitest)
+
+No terminal da pasta `frontend`:
+
+```powershell
+npx vitest run
+
+```

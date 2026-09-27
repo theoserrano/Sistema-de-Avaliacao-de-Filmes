@@ -127,7 +127,7 @@ O projeto conta com cobertura automatizada em ambas as camadas:
 
 ### 1. Configurar e Subir o Backend (FastAPI)
 
-Navegue até à pasta do backend, crie o ambiente virtual e instale as dependências:
+Navegue até a pasta do backend, crie o ambiente virtual e instale as dependências:
 
 ```powershell
 cd backend
@@ -140,55 +140,52 @@ python -m venv .venv
 # source .venv/bin/activate
 
 pip install -r requirements.txt
-
 ```
 
 ---
 
 ### 2. Popular o Banco de Dados (Carga Inicial / Seed)
 
-Antes de iniciar a API pela primeira vez, execute o script de ingestão para carregar os filmes, metadados (diretor, gênero), pessoas e resenhas do dataset para o banco local:
+Com o ambiente virtual ativo, execute a carga inicial dos dados para popular o banco SQLite local (`rocketlab.db`) com filmes, metadados (diretor, gênero), resenhas e estatísticas:
 
 ```powershell
 python -m app.db.seed
-
 ```
 
-Após concluir a carga, inicie o servidor de desenvolvimento:
+*(Caso o ambiente virtual não esteja ativo no terminal, execute diretamente: `.\.venv\Scripts\python.exe -m app.db.seed`)*
+
+Após a conclusão da carga, inicie o servidor backend:
 
 ```powershell
 uvicorn app.main:app --reload
-
 ```
 
-O servidor backend estará disponível em `http://localhost:8000` (documentação Swagger ativa em `/docs`).
+A API estará disponível em `http://localhost:8000` (documentação interativa em `http://localhost:8000/docs`).
 
 ---
 
 ### 3. Configurar e Subir o Frontend (React / Vite)
 
-Em um novo terminal, navegue até à pasta do frontend, instale as dependências e inicie o servidor:
+Em um novo terminal, acesse a pasta do frontend, instale as dependências e inicie a aplicação:
 
 ```powershell
 cd frontend
 npm install
 npm run dev
-
 ```
 
-A aplicação web estará disponível em `http://localhost:5173`.
+Acesse a aplicação no navegador em `http://localhost:5173`.
 
 ---
 
-### 4. Executar as Suítes de Testes
+### 4. Executar os Testes
 
 #### Testes do Backend (Pytest)
 
-No terminal da pasta `backend` com o `.venv` ativo:
+No terminal da pasta `backend` com `.venv` ativo:
 
 ```powershell
 pytest
-
 ```
 
 #### Testes do Frontend (Vitest)
@@ -196,6 +193,6 @@ pytest
 No terminal da pasta `frontend`:
 
 ```powershell
-npx vitest run
-
+npm test
+# ou: npx vitest run
 ```

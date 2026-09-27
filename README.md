@@ -142,11 +142,19 @@ python -m venv .venv
 pip install -r requirements.txt
 
 ```
+
+---
+
 ### 2. Popular o Banco de Dados (Carga Inicial / Seed)
 
 Antes de iniciar a API pela primeira vez, execute o script de ingestão para carregar os filmes, metadados (diretor, gênero), pessoas e resenhas do dataset para o banco local:
 
-Inicie o servidor de desenvolvimento:
+```powershell
+python -m app.db.seed
+
+```
+
+Após concluir a carga, inicie o servidor de desenvolvimento:
 
 ```powershell
 uvicorn app.main:app --reload

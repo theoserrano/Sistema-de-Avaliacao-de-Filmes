@@ -10,7 +10,7 @@ O **Theoboxd** é uma plataforma full-stack inspirada no ecossistema do Letterbo
 
 A interface principal combina a navegação fluida pelo catálogo com a visualização detalhada do filme selecionado, histórico de resenhas e ações rápidas.
 
-![Banner](./readme_images/tela1.png)
+![Banner](./readme_images/telaprincipal.png)
 
 ---
 
@@ -28,11 +28,11 @@ Fluxos de cadastro de filmes e submissão de avaliações são geridos por inter
 
 #### Cadastrar Novo Filme
 
-![Banner](./readme_images/tela4.png)
+![Banner](./readme_images/cadastrarfilme.png)
 
 #### Editar Filme Existente
 
-![Banner](./readme_images/tela3.png)
+![Banner](./readme_images/editarfilme.png)
 
 #### Adicionar Resenha com Nota Numérica
 
@@ -142,6 +142,9 @@ python -m venv .venv
 pip install -r requirements.txt
 
 ```
+### 2. Popular o Banco de Dados (Carga Inicial / Seed)
+
+Antes de iniciar a API pela primeira vez, execute o script de ingestão para carregar os filmes, metadados (diretor, gênero), pessoas e resenhas do dataset para o banco local:
 
 Inicie o servidor de desenvolvimento:
 
@@ -154,7 +157,7 @@ O servidor backend estará disponível em `http://localhost:8000` (documentaçã
 
 ---
 
-### 2. Configurar e Subir o Frontend (React / Vite)
+### 3. Configurar e Subir o Frontend (React / Vite)
 
 Em um novo terminal, navegue até à pasta do frontend, instale as dependências e inicie o servidor:
 
@@ -169,7 +172,7 @@ A aplicação web estará disponível em `http://localhost:5173`.
 
 ---
 
-### 3. Executar as Suítes de Testes
+### 4. Executar as Suítes de Testes
 
 #### Testes do Backend (Pytest)
 

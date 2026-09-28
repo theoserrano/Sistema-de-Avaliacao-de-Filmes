@@ -116,6 +116,9 @@ O projeto conta com cobertura automatizada em ambas as camadas:
 
 ---
 
+### Instruções de Execução
+
+```markdown
 ## Instruções de Execução
 
 ### Pré-requisitos
@@ -140,7 +143,16 @@ python -m venv .venv
 # source .venv/bin/activate
 
 pip install -r requirements.txt
+
 ```
+
+> **Nota:** Caso ocorra erro de dependência assíncrona (`ModuleNotFoundError: greenlet`), garanta a instalação executando:
+> ```powershell
+> pip install "sqlalchemy[asyncio]" aiosqlite greenlet
+> 
+> ```
+> 
+> 
 
 ---
 
@@ -150,17 +162,19 @@ Com o ambiente virtual ativo, execute a carga inicial dos dados para popular o b
 
 ```powershell
 python -m app.db.seed
+
 ```
 
-*(Caso o ambiente virtual não esteja ativo no terminal, execute diretamente: `.\.venv\Scripts\python.exe -m app.db.seed`)*
+*(Caso o PowerShell não ative o ambiente virtual devido a políticas de script, execute diretamente: `.\.venv\Scripts\python.exe -m app.db.seed`)*
 
 Após a conclusão da carga, inicie o servidor backend:
 
 ```powershell
 uvicorn app.main:app --reload
+
 ```
 
-A API estará disponível em `http://localhost:8000` (documentação interativa em `http://localhost:8000/docs`).
+A API estará disponível em `http://localhost:8000` (documentação Swagger interativa ativa em `http://localhost:8000/docs`).
 
 ---
 
@@ -172,20 +186,22 @@ Em um novo terminal, acesse a pasta do frontend, instale as dependências e inic
 cd frontend
 npm install
 npm run dev
+
 ```
 
 Acesse a aplicação no navegador em `http://localhost:5173`.
 
 ---
 
-### 4. Executar os Testes
+### 4. Executar as Suítes de Testes
 
 #### Testes do Backend (Pytest)
 
-No terminal da pasta `backend` com `.venv` ativo:
+No terminal da pasta `backend` com o `.venv` ativo:
 
 ```powershell
 pytest
+
 ```
 
 #### Testes do Frontend (Vitest)
@@ -195,4 +211,5 @@ No terminal da pasta `frontend`:
 ```powershell
 npm test
 # ou: npx vitest run
+
 ```

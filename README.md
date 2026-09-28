@@ -116,9 +116,6 @@ O projeto conta com cobertura automatizada em ambas as camadas:
 
 ---
 
-### Instruções de Execução
-
-```markdown
 ## Instruções de Execução
 
 ### Pré-requisitos
@@ -165,7 +162,7 @@ python -m app.db.seed
 
 ```
 
-*(Caso o PowerShell não ative o ambiente virtual devido a políticas de script, execute diretamente: `.\.venv\Scripts\python.exe -m app.db.seed`)*
+*(Caso o PowerShell não ative o ambiente virtual devido a restrições de script, execute diretamente: `.\.venv\Scripts\python.exe -m app.db.seed`)*
 
 Após a conclusão da carga, inicie o servidor backend:
 
